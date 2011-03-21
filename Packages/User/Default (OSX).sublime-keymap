@@ -1,0 +1,9 @@
+[
+	{ "keys": ["super+d"], "command": "run_macro_file", "args": {"file": "Packages/Default/Delete Line.sublime-macro"} },
+	{ "keys": ["super+up"], "command": "swap_line_up" },
+	{ "keys": ["super+down"], "command": "swap_line_down" },
+	{ "keys": ["super+alt+down"], "command": "duplicate_line" },
+    { "keys": ["ctrl+space"], "command": "auto_complete" },
+
+    { "keys": ["super+k"], "command": "set_mark" }
+]

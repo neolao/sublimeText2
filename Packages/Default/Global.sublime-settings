@@ -1,0 +1,11 @@
+{
+	"folder_exclude_patterns": [".svn", ".git", ".hg", "CVS"],
+	"file_exclude_patterns": ["*.pyc", "*.pyo", "*.exe", "*.dll", "*.obj", "*.o", "*.a", "*.lib", "*.so", "*.dylib", "*.ncb", "*.sdf", "*.suo", "*.pdb", "*.idb", ".DS_Store", "*.pdf"],
+	"new_window_settings":
+	{
+		"side_bar_visible": true,
+		"status_bar_visible": true,
+		"show_tabs": true,
+		"show_minimap": true
+	}
+}
