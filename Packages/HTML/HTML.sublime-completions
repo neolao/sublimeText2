@@ -14,6 +14,7 @@
 		{ "trigger": "big", "contents": "<big>$1</big>" },
 		{ "trigger": "blockquote", "contents": "<blockquote>$1</blockquote>" },
 		{ "trigger": "body", "contents": "<body>$1</body>" },
+		{ "trigger": "button", "contents": "<button>$1</button>" },
 		{ "trigger": "center", "contents": "<center>$1</center>" },
 		{ "trigger": "caption", "contents": "<caption>$1</caption>" },
 		{ "trigger": "cdata", "contents": "<cdata>$1</cdata>" },
@@ -41,6 +42,7 @@
 		{ "trigger": "h5", "contents": "<h5>$1</h5>" },
 		{ "trigger": "h6", "contents": "<h6>$1</h6>" },
 		{ "trigger": "i", "contents": "<i>$1</i>" },
+		{ "trigger": "iframe", "contents": "<iframe src=\"$1\"></iframe>" },
 		{ "trigger": "ins", "contents": "<ins>$1</ins>" },
 		{ "trigger": "kbd", "contents": "<kbd>$1</kbd>" },
 		{ "trigger": "li", "contents": "<li>$1</li>" },
@@ -52,6 +54,7 @@
 		{ "trigger": "object", "contents": "<object>$1</object>" },
 		{ "trigger": "ol", "contents": "<ol>$1</ol>" },
 		{ "trigger": "optgroup", "contents": "<optgroup>$1</optgroup>" },
+		{ "trigger": "option", "contents": "<option>$0</option>" },
 		{ "trigger": "p", "contents": "<p>$1</p>" },
 		{ "trigger": "pre", "contents": "<pre>$1</pre>" },
 		{ "trigger": "span", "contents": "<span>$1</span>" },
@@ -77,14 +80,12 @@
 		{ "trigger": "var", "contents": "<var>$1</var>" },
 
 		{ "trigger": "br", "contents": "<br>" },
-		{ "trigger": "button", "contents": "<button>" },
 		{ "trigger": "embed", "contents": "<embed>" },
 		{ "trigger": "hr", "contents": "<hr>" },
 		{ "trigger": "img", "contents": "<img src=\"$1\">" },
 		{ "trigger": "input", "contents": "<input>" },
 		{ "trigger": "meta", "contents": "<meta>" },
-		{ "trigger": "option", "contents": "<option>" },
-		{ "trigger": "param", "contents": "<param>" },
+		{ "trigger": "param", "contents": "<param name=\"$1\" value=\"$2\">" },
 
 
 		{ "trigger": "A", "contents": "<A HREF=\"$1\">$2</A>" },
@@ -98,6 +99,7 @@
 		{ "trigger": "BIG", "contents": "<BIG>$1</BIG>" },
 		{ "trigger": "BLOCKQUOTE", "contents": "<BLOCKQUOTE>$1</BLOCKQUOTE>" },
 		{ "trigger": "BODY", "contents": "<BODY>$1</BODY>" },
+		{ "trigger": "BUTTON", "contents": "<BUTTON>$1</BUTTON>" },
 		{ "trigger": "CENTER", "contents": "<CENTER>$1</CENTER>" },
 		{ "trigger": "CAPTION", "contents": "<CAPTION>$1</CAPTION>" },
 		{ "trigger": "CDATA", "contents": "<CDATA>$1</CDATA>" },
@@ -125,6 +127,7 @@
 		{ "trigger": "H5", "contents": "<H5>$1</H5>" },
 		{ "trigger": "H6", "contents": "<H6>$1</H6>" },
 		{ "trigger": "I", "contents": "<I>$1</I>" },
+		{ "trigger": "IFRAME", "contents": "<IFRAME src=\"$1\"></IFRAME>" },
 		{ "trigger": "INS", "contents": "<INS>$1</INS>" },
 		{ "trigger": "KBD", "contents": "<KBD>$1</KBD>" },
 		{ "trigger": "LI", "contents": "<LI>$1</LI>" },
@@ -136,6 +139,7 @@
 		{ "trigger": "OBJECT", "contents": "<OBJECT>$1</OBJECT>" },
 		{ "trigger": "OL", "contents": "<OL>$1</OL>" },
 		{ "trigger": "OPTGROUP", "contents": "<OPTGROUP>$1</OPTGROUP>" },
+		{ "trigger": "OPTION", "contents": "<OPTION>$1</OPTION>" },
 		{ "trigger": "P", "contents": "<P>$1</P>" },
 		{ "trigger": "PRE", "contents": "<PRE>$1</PRE>" },
 		{ "trigger": "SPAN", "contents": "<SPAN>$1</SPAN>" },
@@ -162,13 +166,11 @@
 		{ "trigger": "VAR", "contents": "<VAR>$1</VAR>" },
 
 		{ "trigger": "BR", "contents": "<BR>" },
-		{ "trigger": "BUTTON", "contents": "<BUTTON>" },
 		{ "trigger": "EMBED", "contents": "<EMBED>" },
 		{ "trigger": "HR", "contents": "<HR>" },
 		{ "trigger": "IMG", "contents": "<IMG SRC=\"$1\">" },
 		{ "trigger": "INPUT", "contents": "<INPUT>" },
 		{ "trigger": "META", "contents": "<META>" },
-		{ "trigger": "OPTION", "contents": "<OPTION>" },
-		{ "trigger": "PARAM", "contents": "<PARAM>" }
+		{ "trigger": "PARAM", "contents": "<PARAM NAME=\"$1\" VALUE=\"$2\">" }
 	]
 }

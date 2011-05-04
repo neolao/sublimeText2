@@ -93,8 +93,6 @@
                 "id": "line",
                 "children":
                 [
-                    { "command": "prompt_goto_line", "caption": "Goto Line" },
-                    { "caption": "-" },
                     { "command": "indent" },
                     { "command": "unindent" },
                     { "command": "swap_line_up" },
@@ -488,6 +486,14 @@
                     { "command": "set_setting", "args": {"setting": "rulers", "value": [100]}, "caption": "100", "checkbox": true },
                     { "command": "set_setting", "args": {"setting": "rulers", "value": [120]}, "caption": "120", "checkbox": true }
                 ]
+            },
+            { "caption": "-" },
+            { "command": "toggle_setting", "args": {"setting": "spell_check"}, "caption": "Spell Check", "checkbox": true },
+            { "command": "next_misspelling" },
+            { "command": "prev_misspelling" },
+            {
+                "caption": "Dictionary",
+                "children": [ { "command": "$dictionaries" } ]
             }
         ]
     },

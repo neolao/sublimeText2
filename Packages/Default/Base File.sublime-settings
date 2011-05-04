@@ -127,9 +127,11 @@
 	// 'unix' (LF only).
 	"default_line_ending": "system",
 
-	// When false, tab will only trigger snippets or insert a tab character. Set
-	// it to true to make it insert the best matching completion from any source.
-	"tab_completion": false,
+	// When enabled, pressing tab will insert the best matching completion.
+	// When disabled, tab will only trigger snippets or insert a tab.
+	// Shift+tab can be used to insert an explicit tab when tab_completion is
+	// enabled.
+	"tab_completion": true,
 
 	// If true, the selected text will be copied into the find panel when it's
 	// shown.

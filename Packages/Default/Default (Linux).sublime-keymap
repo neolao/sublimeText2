@@ -138,7 +138,13 @@
 			{ "key": "has_next_field", "operator": "equal", "operand": true }
 		]
 	},
-	{ "keys": ["shift+tab"], "command": "unindent" },
+
+	{ "keys": ["shift+tab"], "command": "insert", "args": {"characters": "\t"} },
+	{ "keys": ["shift+tab"], "command": "unindent", "context":
+		[
+			{ "key": "text", "operator": "regex_contains", "operand": "\n" }
+		]
+	},
 	{ "keys": ["shift+tab"], "command": "prev_field", "context":
 		[
 			{ "key": "has_prev_field", "operator": "equal", "operand": true }
@@ -188,6 +194,10 @@
 	{ "keys": ["f4"], "command": "next_result" },
 	{ "keys": ["shift+f4"], "command": "prev_result" },
 
+	{ "keys": ["f6"], "command": "toggle_setting", "args": {"setting": "spell_check"} },
+	{ "keys": ["ctrl+f6"], "command": "next_misspelling" },
+	{ "keys": ["ctrl+shift+f6"], "command": "prev_misspelling" },
+
 	{ "keys": ["ctrl+shift+up"], "command": "swap_line_up" },
 	{ "keys": ["ctrl+shift+down"], "command": "swap_line_down" },
 
@@ -203,6 +213,12 @@
 	{ "keys": ["ctrl+`"], "command": "show_panel", "args": {"panel": "console"} },
 
 	{ "keys": ["ctrl+space"], "command": "auto_complete" },
+	{ "keys": ["ctrl+space"], "command": "replace_completion_with_auto_complete", "context":
+		[
+			{ "key": "last_command", "operator": "equal", "operand": "insert_best_completion" },
+			{ "key": "setting.tab_completion", "operator": "equal", "operand": true }
+		]
+	},
 
 	{ "keys": ["ctrl+alt+p"], "command": "show_scope_name" },
 

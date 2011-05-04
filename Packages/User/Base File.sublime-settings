@@ -1,10 +1,20 @@
 {
 	"color_scheme": "Packages/Color Scheme - Default/Monokai Bright.tmTheme",
 	"default_line_ending": "unix",
-	"draw_white_space": "selection",
+
+    // Set to "none" to turn off drawing white space, "selection" to draw only the
+    // white space within the selection, and "all" to draw all white space
+	"draw_white_space": "all",
+
 	"fallback_encoding": "UTF-8",
 	"font_face": "DejaVu Sans Mono",
 	"font_size": 14,
 	"translate_tabs_to_spaces": true,
-	"word_wrap": false
+	"word_wrap": false,
+
+    // When enabled, pressing tab will insert the best matching completion.
+    // When disabled, tab will only trigger snippets or insert a tab.
+    // Shift+tab can be used to insert an explicit tab when tab_completion is
+    // enabled.
+    "tab_completion": false
 }

@@ -82,7 +82,6 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["super+]"], "command": "indent" },
 	{ "keys": ["super+["], "command": "unindent" },
 
-
 	{ "keys": ["tab"], "command": "insert_best_completion", "args": {"default": "\t", "exact": true} },
 	{ "keys": ["tab"], "command": "insert_best_completion", "args": {"default": "\t", "exact": false},
 		"context":
@@ -108,7 +107,13 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 			{ "key": "has_next_field", "operator": "equal", "operand": true }
 		]
 	},
-	{ "keys": ["shift+tab"], "command": "unindent" },
+
+	{ "keys": ["shift+tab"], "command": "insert", "args": {"characters": "\t"} },
+	{ "keys": ["shift+tab"], "command": "unindent", "context":
+		[
+			{ "key": "text", "operator": "regex_contains", "operand": "\n" }
+		]
+	},
 	{ "keys": ["shift+tab"], "command": "prev_field", "context":
 		[
 			{ "key": "has_prev_field", "operator": "equal", "operand": true }
@@ -154,6 +159,10 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["f4"], "command": "next_result" },
 	{ "keys": ["shift+f4"], "command": "prev_result" },
 
+	{ "keys": ["f6"], "command": "toggle_setting", "args": {"setting": "spell_check"} },
+	{ "keys": ["ctrl+f6"], "command": "next_misspelling" },
+	{ "keys": ["ctrl+shift+f6"], "command": "prev_misspelling" },
+
 	{ "keys": ["ctrl+super+up"], "command": "swap_line_up" },
 	{ "keys": ["ctrl+super+down"], "command": "swap_line_down" },
 
@@ -169,6 +178,12 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["ctrl+backquote"], "command": "show_panel", "args": {"panel": "console"} },
 
 	{ "keys": ["ctrl+space"], "command": "auto_complete" },
+	{ "keys": ["ctrl+space"], "command": "replace_completion_with_auto_complete", "context":
+		[
+			{ "key": "last_command", "operator": "equal", "operand": "insert_best_completion" },
+			{ "key": "setting.tab_completion", "operator": "equal", "operand": true }
+		]
+	},
 
 	{ "keys": ["super+alt+p"], "command": "show_scope_name" },
 

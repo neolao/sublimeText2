@@ -1,5 +1,5 @@
 import sublime, sublime_plugin
-import os
+import os, sys
 import thread
 import subprocess
 import functools
@@ -11,8 +11,15 @@ class ProcessListener(object):
     def on_finished(self, proc):
         pass
 
+# Encapsulates subprocess.Popen, forwarding stdout to a supplied
+# ProcessListener (on a separate thread)
 class AsyncProcess(object):
-    def __init__(self, arg_list, env, listener):
+    def __init__(self, arg_list, env, listener,
+            # "path" is an option in build systems
+            path="",
+            # "shell" is an options in build systems
+            shell=False):
+
         self.listener = listener
         self.killed = False
 
@@ -22,11 +29,23 @@ class AsyncProcess(object):
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
+        # Set temporary PATH to locate executable in arg_list
+        if path:
+            old_path = os.environ["PATH"]
+            # The user decides in the build system  whether he wants to append $PATH
+            # or tuck it at the front: "$PATH;C:\\new\\path", "C:\\new\\path;$PATH"
+            os.environ["PATH"] = os.path.expandvars(path).encode(sys.getfilesystemencoding())
+
         proc_env = os.environ.copy()
         proc_env.update(env)
+        for k, v in proc_env.iteritems():
+            proc_env[k] = os.path.expandvars(v).encode(sys.getfilesystemencoding())
 
         self.proc = subprocess.Popen(arg_list, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, startupinfo=startupinfo, env=proc_env)
+            stderr=subprocess.PIPE, startupinfo=startupinfo, env=proc_env, shell=shell)
+
+        if path:
+            os.environ["PATH"] = old_path
 
         if self.proc.stdout:
             thread.start_new_thread(self.read_stdout, ())
@@ -69,7 +88,9 @@ class AsyncProcess(object):
 
 class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
     def run(self, cmd = [], file_regex = "", line_regex = "", working_dir = "",
-            encoding = "utf-8", env = {}, quiet = False, kill = False):
+            encoding = "utf-8", env = {}, quiet = False, kill = False,
+            # Catches "path" and "shell"
+            **kwargs):
 
         if kill:
             if self.proc:
@@ -86,8 +107,8 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
         self.output_view.settings().set("result_line_regex", line_regex)
         self.output_view.settings().set("result_base_dir", working_dir)
 
-        # Dumb, but required for the moment for the output panel to be picked
-        # up as the result buffer
+        # Call get_output_panel a second time after assigning the above
+        # settings, so that it'll be picked up as a result buffer
         self.window.get_output_panel("exec")
 
         self.encoding = encoding
@@ -115,7 +136,8 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             err_type = WindowsError
 
         try:
-            self.proc = AsyncProcess(cmd, merged_env, self)
+            # Forward kwargs to AsyncProcess
+            self.proc = AsyncProcess(cmd, merged_env, self, **kwargs)
         except err_type as e:
             self.append_data(None, str(e) + "\n")
             if not self.quiet:
