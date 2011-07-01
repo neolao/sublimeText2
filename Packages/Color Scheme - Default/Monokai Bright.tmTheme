@@ -23,6 +23,14 @@
 				<string>#9D550F</string>
 				<key>selectionForeground</key>
 				<string>#fffff8</string>
+				<key>inactiveSelection</key>
+				<string>#bbbbbb</string>
+				<key>inactiveSelectionForeground</key>
+				<string>#222222</string>
+				<key>findHighlight</key>
+				<string>#FFE792</string>
+				<key>findHighlightForeground</key>
+				<string>#000000</string>
 			</dict>
 		</dict>
 		<dict>

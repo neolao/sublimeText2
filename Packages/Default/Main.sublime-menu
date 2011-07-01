@@ -26,6 +26,43 @@
                 ]
             },
             {
+                "caption": "Reopen with Encoding",
+                "children":
+                [
+                    { "caption": "UTF-8", "command": "reopen", "args": {"encoding": "utf-8" } },
+                    { "caption": "UTF-16 LE", "command": "reopen", "args": {"encoding": "utf-16 le" } },
+                    { "caption": "UTF-16 BE", "command": "reopen", "args": {"encoding": "utf-16 be" } },
+                    { "caption": "Western (Windows 1252)", "command": "reopen", "args": {"encoding": "Western (Windows 1252)" } },
+                    { "caption": "Western (ISO 8859-1)", "command": "reopen", "args": {"encoding": "Western (ISO 8859-1)" } },
+                    { "caption": "Western (ISO 8859-3)", "command": "reopen", "args": {"encoding": "Western (ISO 8859-3)" } },
+                    { "caption": "Western (ISO 8859-15)", "command": "reopen", "args": {"encoding": "Western (ISO 8859-15)" } },
+                    { "caption": "Western (Mac Roman)", "command": "reopen", "args": {"encoding": "Western (Mac Roman)" } },
+                    { "caption": "DOS (CP 437)", "command": "reopen", "args": {"encoding": "DOS (CP 437)" } },
+                    { "caption": "Arabic (Windows 1256)", "command": "reopen", "args": {"encoding": "Arabic (Windows 1256)" } },
+                    { "caption": "Arabic (ISO 8859-6)", "command": "reopen", "args": {"encoding": "Arabic (ISO 8859-6)" } },
+                    { "caption": "Baltic (Windows 1257)", "command": "reopen", "args": {"encoding": "Baltic (Windows 1257)" } },
+                    { "caption": "Baltic (ISO 8859-4)", "command": "reopen", "args": {"encoding": "Baltic (ISO 8859-4)" } },
+                    { "caption": "Celtic (ISO 8859-14)", "command": "reopen", "args": {"encoding": "Celtic (ISO 8859-14)" } },
+                    { "caption": "Central European (Windows 1250)", "command": "reopen", "args": {"encoding": "Central European (Windows 1250)" } },
+                    { "caption": "Central European (ISO 8859-2)", "command": "reopen", "args": {"encoding": "Central European (ISO 8859-2)" } },
+                    { "caption": "Cyrillic (Windows 1251)", "command": "reopen", "args": {"encoding": "Cyrillic (Windows 1251)" } },
+                    { "caption": "Cyrillic (Windows 866)", "command": "reopen", "args": {"encoding": "Cyrillic (Windows 866)" } },
+                    { "caption": "Cyrillic (ISO 8859-5)", "command": "reopen", "args": {"encoding": "Cyrillic (ISO 8859-5)" } },
+                    { "caption": "Cyrillic (KOI8-R)", "command": "reopen", "args": {"encoding": "Cyrillic (KOI8-R)" } },
+                    { "caption": "Cyrillic (KOI8-U)", "command": "reopen", "args": {"encoding": "Cyrillic (KOI8-U)" } },
+                    { "caption": "Estonian (ISO 8859-13)", "command": "reopen", "args": {"encoding": "Estonian (ISO 8859-13)" } },
+                    { "caption": "Greek (Windows 1253)", "command": "reopen", "args": {"encoding": "Greek (Windows 1253)" } },
+                    { "caption": "Greek (ISO 8859-7)", "command": "reopen", "args": {"encoding": "Greek (ISO 8859-7)" } },
+                    { "caption": "Hebrew (Windows 1255)", "command": "reopen", "args": {"encoding": "Hebrew (Windows 1255)" } },
+                    { "caption": "Hebrew (ISO 8859-8)", "command": "reopen", "args": {"encoding": "Hebrew (ISO 8859-8)" } },
+                    { "caption": "Nordic (ISO 8859-10)", "command": "reopen", "args": {"encoding": "Nordic (ISO 8859-10)" } },
+                    { "caption": "Romanian (ISO 8859-16)", "command": "reopen", "args": {"encoding": "Romanian (ISO 8859-16)" } },
+                    { "caption": "Turkish (Windows 1254)", "command": "reopen", "args": {"encoding": "Turkish (Windows 1254)" } },
+                    { "caption": "Turkish (ISO 8859-9)", "command": "reopen", "args": {"encoding": "Turkish (ISO 8859-9)" } },
+                    { "caption": "Vietnamese (Windows 1258)", "command": "reopen", "args": {"encoding": "Vietnamese (Windows 1258)" } }
+                ]
+            },
+            {
                 "caption": "Switch File",
                 "mnemonic": "t",
                 "id": "switch_file",
@@ -62,6 +99,7 @@
             { "caption": "-", "id": "close" },
             { "command": "close", "caption": "Close File", "mnemonic": "C" },
             { "command": "revert", "caption": "Revert File", "mnemonic": "v" },
+            { "command": "close_all", "caption": "Close All Files" },
             { "caption": "-", "id": "exit" },
             { "command": "hot_exit", "caption": "Hot Exit", "mnemonic": "x" }
         ]
@@ -313,6 +351,7 @@
             { "command": "show_panel", "args": {"panel": "console"} },
             { "caption": "-", "id": "full_screen" },
             { "command": "toggle_full_screen" },
+            { "command": "toggle_distraction_free" },
             { "caption": "-", "id": "groups" },
             {
                 "caption": "Layout",
@@ -444,7 +483,7 @@
                     { "caption": "-" },
                     { "command": "detect_indentation", "caption": "Guess Settings From Buffer" },
                     { "caption": "-" },
-                    { "command": "expand_tabs", "caption": "Convert Indentation to Spaces", "args": {"set_translate_tabs": true}  },
+                    { "command": "expand_tabs", "caption": "Convert Indentation to Spaces", "args": {"set_translate_tabs": true} },
                     { "command": "unexpand_tabs", "caption": "Convert Indentation to Tabs", "args": {"set_translate_tabs": true} }
                 ]
             },
@@ -503,6 +542,8 @@
         "id": "tools",
         "children":
         [
+            { "command": "show_overlay", "args": {"overlay": "command_palette"}, "caption": "Command Palette" },
+            { "caption": "-" },
             {
                 "caption": "Snippets",
                 "mnemonic": "S",
@@ -590,11 +631,11 @@
         [
             { "command": "open_dir", "args": {"dir": "$packages"}, "caption": "Browse Packages…", "mnemonic": "B" },
             { "caption": "-" },
-            { "command": "open_file", "args": {"file": "${packages}/Default/Base File.sublime-settings"}, "caption": "Default File Preferences" },
-            { "command": "open_file", "args": {"file": "${packages}/User/Base File.sublime-settings"}, "caption": "User File Preferences" },
+            { "command": "open_file", "args": {"file": "${packages}/Default/Base File.sublime-settings"}, "caption": "Default File Settings" },
+            { "command": "open_file", "args": {"file": "${packages}/User/Base File.sublime-settings"}, "caption": "User File Settings" },
             { "caption": "-" },
-            { "command": "open_file", "args": {"file": "${packages}/Default/Global.sublime-settings"}, "caption": "Default Global Preferences" },
-            { "command": "open_file", "args": {"file": "${packages}/User/Global.sublime-settings"}, "caption": "User Global Preferences" },
+            { "command": "open_file", "args": {"file": "${packages}/Default/Global.sublime-settings"}, "caption": "Default Global Settings" },
+            { "command": "open_file", "args": {"file": "${packages}/User/Global.sublime-settings"}, "caption": "User Global Settings" },
             { "caption": "-" },
             {
                 "command": "open_file", "args":

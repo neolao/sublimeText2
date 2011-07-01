@@ -125,8 +125,17 @@ class ToggleCommentCommand(sublime_plugin.TextCommand):
 
     def block_comment_region(self, view, edit, block_comment_data, region):
         (start, end, disable_indent) = block_comment_data
-        view.insert(edit, region.end(), end)
-        view.insert(edit, region.begin(), start)
+
+        if region.empty():
+            # Silly buggers to ensure the cursor doesn't end up after the end
+            # comment token
+            view.replace(edit, sublime.Region(region.end()), 'x')
+            view.insert(edit, region.end() + 1, end)
+            view.replace(edit, sublime.Region(region.end(), region.end() + 1), '')
+            view.insert(edit, region.begin(), start)
+        else:
+            view.insert(edit, region.end(), end)
+            view.insert(edit, region.begin(), start)
 
     def line_comment_region(self, view, edit, line_comment_data, region):
         (start, disable_indent) = line_comment_data
@@ -172,7 +181,7 @@ class ToggleCommentCommand(sublime_plugin.TextCommand):
             prefer_block = True
 
         if region.empty():
-            if len(line_comments) == 0:
+            if prefer_block:
                 # add the block comment
                 self.block_comment_region(view, edit, block_comments[0], region)
             else:

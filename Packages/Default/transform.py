@@ -25,3 +25,6 @@ class LowerCaseCommand(Transformer):
 
 class TitleCaseCommand(Transformer):
     transformer = lambda s: string.capwords(s, " "),
+
+class Rot13Command(Transformer):
+    transformer = lambda s: s.encode('rot13'),

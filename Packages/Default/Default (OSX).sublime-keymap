@@ -15,6 +15,7 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 
 	{ "keys": ["ctrl+s"], "command": "toggle_side_bar" },
 	{ "keys": ["super+alt+f"], "command": "toggle_full_screen" },
+	{ "keys": ["super+alt+shift+f"], "command": "toggle_distraction_free" },
 
 	{ "keys": ["super+z"], "command": "undo" },
 	{ "keys": ["super+shift+z"], "command": "redo" },
@@ -111,6 +112,11 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["shift+tab"], "command": "insert", "args": {"characters": "\t"} },
 	{ "keys": ["shift+tab"], "command": "unindent", "context":
 		[
+			{ "key": "setting.shift_tab_unindent", "operator": "equal", "operand": true }
+		]
+	},
+	{ "keys": ["shift+tab"], "command": "unindent", "context":
+		[
 			{ "key": "text", "operator": "regex_contains", "operand": "\n" }
 		]
 	},
@@ -138,7 +144,8 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["super+shift+enter"], "command": "run_macro_file", "args": {"file": "Packages/Default/Add Line Before.sublime-macro"} },
 
 	{ "keys": ["super+p"], "command": "show_overlay", "args": {"overlay": "goto"} },
-	{ "keys": ["super+shift+p"], "command": "prompt_select_project" },
+	{ "keys": ["super+shift+p"], "command": "show_overlay", "args": {"overlay": "command_palette"} },
+	{ "keys": ["super+ctrl+p"], "command": "prompt_select_project" },
 	{ "keys": ["super+t"], "command": "show_overlay", "args": {"overlay": "goto", "show_files": true} },
 	{ "keys": ["super+r"], "command": "show_overlay", "args": {"overlay": "goto", "text": "@"} },
 	{ "keys": ["ctrl+g"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} },
@@ -199,7 +206,7 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 		[
 			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
-			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|$)", "match_all": true },
+			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|\\}|$)", "match_all": true },
 			{ "key": "preceding_text", "operator": "not_regex_contains", "operand": "[\"a-zA-Z0-9_]$", "match_all": true },
 			{ "key": "eol_selector", "operator": "not_equal", "operand": "string.quoted.double", "match_all": true }
 		]
@@ -231,7 +238,7 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 		[
 			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
-			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|$)", "match_all": true },
+			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|\\}|$)", "match_all": true },
 			{ "key": "preceding_text", "operator": "not_regex_contains", "operand": "['a-zA-Z0-9_]$", "match_all": true },
 			{ "key": "eol_selector", "operator": "not_equal", "operand": "string.quoted.single", "match_all": true }
 		]
@@ -263,7 +270,7 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 		[
 			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
-			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|$)", "match_all": true }
+			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|;|\\}|$)", "match_all": true }
 		]
 	},
 	{ "keys": ["("], "command": "insert_snippet", "args": {"contents": "(${0:$SELECTION})"}, "context":
@@ -293,7 +300,7 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 		[
 			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
-			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|$)", "match_all": true }
+			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|;|\\}|$)", "match_all": true }
 		]
 	},
 	{ "keys": ["["], "command": "insert_snippet", "args": {"contents": "[${0:$SELECTION}]"}, "context":
@@ -476,7 +483,32 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["super+equals"], "command": "increase_font_size" },
 	{ "keys": ["super+minus"], "command": "decrease_font_size" },
 
+	{ "keys": ["ctrl+shift+w"], "command": "insert_snippet", "args": { "name": "Packages/XML/long-tag.sublime-snippet" } },
+
 	{ "keys": ["ctrl+shift+k"], "command": "run_macro_file", "args": {"file": "Packages/Default/Delete Line.sublime-macro"} },
+
+	{ "keys": ["super+alt+q"], "command": "wrap_lines" },
+
+	{ "keys": ["super+alt+c"], "command": "toggle_case_sensitive", "context":
+		[
+			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
+		]
+	},
+	{ "keys": ["super+alt+r"], "command": "toggle_regex", "context":
+		[
+			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
+		]
+	},
+	{ "keys": ["super+alt+w"], "command": "toggle_whole_word", "context":
+		[
+			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
+		]
+	},
+	{ "keys": ["super+alt+p"], "command": "toggle_preserve_case", "context":
+		[
+			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
+		]
+	},
 
 	// These are OS X builtin commands, and don't need to be listed here, but
 	// doing so lets them show up in the menu
@@ -486,6 +518,7 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["ctrl+l"], "command": "show_at_center" },
 	{ "keys": ["ctrl+o"], "command": "insert_snippet", "args": { "contents": "$0\n" } },
 	{ "keys": ["ctrl+super+d"], "command": "noop" },
+	{ "keys": ["ctrl+super+shift+d"], "command": "noop" },
 
 	{ "keys": ["super+k", "super+y"], "command": "yank" },
 	{ "keys": ["super+k", "super+k"], "command": "run_macro_file", "args": {"file": "Packages/Default/Delete to Hard EOL.sublime-macro"} },

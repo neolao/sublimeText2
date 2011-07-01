@@ -103,6 +103,11 @@ class ExecCommand(sublime_plugin.WindowCommand, ProcessListener):
             # Try not to call get_output_panel until the regexes are assigned
             self.output_view = self.window.get_output_panel("exec")
 
+        # Default the to the current files directory if no working directory was given
+        if (working_dir == "" and self.window.active_view()
+                        and self.window.active_view().file_name() != ""):
+            working_dir = os.path.dirname(self.window.active_view().file_name())
+
         self.output_view.settings().set("result_file_regex", file_regex)
         self.output_view.settings().set("result_line_regex", line_regex)
         self.output_view.settings().set("result_base_dir", working_dir)

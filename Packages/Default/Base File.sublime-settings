@@ -4,7 +4,7 @@
 // in Packages/Python/Python.sublime-settings for python files.
 {
 	// Sets the colors used within the text area
-	"color_scheme": "Packages/Color Scheme - Default/Monokai Bright.tmTheme",
+	"color_scheme": "Packages/Color Scheme - Default/Monokai.tmTheme",
 
 	// Note that the font_face and font_size are overriden in the platform
 	// specific settings file, for example, "Base File (Linux).sublime-settings".
@@ -114,6 +114,10 @@
 	// Set to true to removing trailing white space on save
 	"trim_trailing_white_space_on_save": false,
 
+	// Set to true to ensure the last line of the file ends in a newline
+	// character when saving
+	"ensure_newline_at_eof_on_save": false,
+
 	// Set to true to automatically save files when switching to a different file
 	// or application
 	"save_on_focus_lost": false,
@@ -132,6 +136,13 @@
 	// Shift+tab can be used to insert an explicit tab when tab_completion is
 	// enabled.
 	"tab_completion": true,
+
+	// By default, shift+tab will only unindent if the selection spans
+	// multiple lines. When pressing shift+tab at other times, it'll insert a
+	// tab character - this allows tabs to be inserted when tab_completion is
+	// enabled. Set this to true to make shift+tab always unindent, instead of
+	// inserting tabs.
+	"shift_tab_unindent": false,
 
 	// If true, the selected text will be copied into the find panel when it's
 	// shown.

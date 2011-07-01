@@ -11,6 +11,7 @@
 
 	{ "keys": ["ctrl+b"], "command": "toggle_side_bar" },
 	{ "keys": ["f11"], "command": "toggle_full_screen" },
+	{ "keys": ["shift+f11"], "command": "toggle_distraction_free" },
 
 	{ "keys": ["backspace"], "command": "left_delete" },
 	{ "keys": ["shift+backspace"], "command": "left_delete" },
@@ -140,6 +141,11 @@
 	{ "keys": ["shift+tab"], "command": "insert", "args": {"characters": "\t"} },
 	{ "keys": ["shift+tab"], "command": "unindent", "context":
 		[
+			{ "key": "setting.shift_tab_unindent", "operator": "equal", "operand": true }
+		]
+	},
+	{ "keys": ["shift+tab"], "command": "unindent", "context":
+		[
 			{ "key": "text", "operator": "regex_contains", "operand": "\n" }
 		]
 	},
@@ -172,7 +178,8 @@
 	{ "keys": ["ctrl+shift+enter"], "command": "run_macro_file", "args": {"file": "Packages/Default/Add Line Before.sublime-macro"} },
 
 	{ "keys": ["ctrl+p"], "command": "show_overlay", "args": {"overlay": "goto"} },
-	{ "keys": ["ctrl+shift+p"], "command": "prompt_select_project" },
+	{ "keys": ["ctrl+shift+p"], "command": "show_overlay", "args": {"overlay": "command_palette"} },
+	{ "keys": ["ctrl+alt+p"], "command": "prompt_select_project" },
 	{ "keys": ["ctrl+r"], "command": "show_overlay", "args": {"overlay": "goto", "text": "@"} },
 	{ "keys": ["ctrl+g"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} },
 	{ "keys": ["ctrl+;"], "command": "show_overlay", "args": {"overlay": "goto", "text": "#"} },
@@ -218,7 +225,7 @@
 		]
 	},
 
-	{ "keys": ["ctrl+alt+p"], "command": "show_scope_name" },
+	{ "keys": ["ctrl+alt+shift+p"], "command": "show_scope_name" },
 
 	{ "keys": ["f7"], "command": "build" },
 	{ "keys": ["ctrl+break"], "command": "exec", "args": {"kill": true} },
@@ -297,7 +304,7 @@
 		[
 			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
-			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|\\}|$)", "match_all": true }
+			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|;|\\}|$)", "match_all": true }
 		]
 	},
 	{ "keys": ["("], "command": "insert_snippet", "args": {"contents": "(${0:$SELECTION})"}, "context":
@@ -327,7 +334,7 @@
 		[
 			{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
 			{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
-			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|\\}|$)", "match_all": true }
+			{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\)|]|;|\\}|$)", "match_all": true }
 		]
 	},
 	{ "keys": ["["], "command": "insert_snippet", "args": {"contents": "[${0:$SELECTION}]"}, "context":
@@ -519,5 +526,28 @@
 	{ "keys": ["ctrl+="], "command": "increase_font_size" },
 	{ "keys": ["ctrl+keypad_plus"], "command": "increase_font_size" },
 	{ "keys": ["ctrl+-"], "command": "decrease_font_size" },
-	{ "keys": ["ctrl+keypad_minus"], "command": "decrease_font_size" }
+	{ "keys": ["ctrl+keypad_minus"], "command": "decrease_font_size" },
+
+	{ "keys": ["alt+shift+w"], "command": "insert_snippet", "args": { "name": "Packages/XML/long-tag.sublime-snippet" } },
+
+	{ "keys": ["alt+c"], "command": "toggle_case_sensitive", "context":
+		[
+			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
+		]
+	},
+	{ "keys": ["alt+r"], "command": "toggle_regex", "context":
+		[
+			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
+		]
+	},
+	{ "keys": ["alt+w"], "command": "toggle_whole_word", "context":
+		[
+			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
+		]
+	},
+	{ "keys": ["alt+p"], "command": "toggle_preserve_case", "context":
+		[
+			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
+		]
+	}
 ]

@@ -3,17 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>name</key>
-	<string>Symbol List: Method / Constructor</string>
+	<string>Symbol List</string>
 	<key>scope</key>
-	<string>source.scala meta.definition.method, source.scala meta.definition.constructor</string>
+	<string>entity.name.function.declaration, entity.name.class.declaration, entity.name.val.declaration, entity.name.type.declaration</string>
 	<key>settings</key>
 	<dict>
 		<key>showInSymbolList</key>
 		<integer>1</integer>
-		<key>symbolTransformation</key>
-		<string>s/^\s*[^(]*\s(\w+\s*\(.*)$/$1/</string>
 	</dict>
 	<key>uuid</key>
-	<string>700924A0-8541-4D3B-8AEC-80CB4D6DC074</string>
+	<string>31262BFB-520A-4253-A81C-60023C0CFC8B</string>
 </dict>
 </plist>
