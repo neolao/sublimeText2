@@ -364,7 +364,8 @@
 			<key>comment</key>
 			<string>Attempt to match "foo": function</string>
 			<key>match</key>
-			<string>(?:((')(.*?)('))|((")(.*?)(")))\s*:\s*\b(function)?\s*(\()(.*?)(\))</string>
+			<string>(?:((')([^']*)('))|((")([^"]*)(")))\s*:\s*\b(function)?\s*(\()([^)]*)(\))</string>
+			<!-- <string>(?:((')(.*?)('))|((")(.*?)(")))\s*:\s*\b(function)?\s*(\()(.*?)(\))</string> -->
 			<key>name</key>
 			<string>meta.function.json.js</string>
 		</dict>

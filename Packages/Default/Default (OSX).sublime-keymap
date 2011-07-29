@@ -14,8 +14,8 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 	{ "keys": ["super+w"], "command": "close" },
 
 	{ "keys": ["ctrl+s"], "command": "toggle_side_bar" },
-	{ "keys": ["super+alt+f"], "command": "toggle_full_screen" },
-	{ "keys": ["super+alt+shift+f"], "command": "toggle_distraction_free" },
+	{ "keys": ["super+ctrl+f"], "command": "toggle_full_screen" },
+	{ "keys": ["super+ctrl+shift+f"], "command": "toggle_distraction_free" },
 
 	{ "keys": ["super+z"], "command": "undo" },
 	{ "keys": ["super+shift+z"], "command": "redo" },
@@ -152,7 +152,8 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 
 	{ "keys": ["super+i"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse":false} },
 	{ "keys": ["super+shift+i"], "command": "show_panel", "args": {"panel": "incremental_find", "reverse":true} },
-	{ "keys": ["super+f"], "command": "show_panel", "args": {"panel": "replace"} },
+	{ "keys": ["super+f"], "command": "show_panel", "args": {"panel": "find"} },
+	{ "keys": ["super+alt+f"], "command": "show_panel", "args": {"panel": "replace"} },
 	{ "keys": ["super+g"], "command": "find_next" },
 	{ "keys": ["super+shift+g"], "command": "find_prev" },
 	{ "keys": ["super+e"], "command": "slurp_find_string" },
@@ -509,6 +510,9 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
 		]
 	},
+
+	{ "keys": ["super+alt+o"], "command": "toggle_overwrite" },
+	{ "keys": ["super+,"], "command": "open_file", "args": {"file": "${packages}/User/Base File.sublime-settings"} },
 
 	// These are OS X builtin commands, and don't need to be listed here, but
 	// doing so lets them show up in the menu

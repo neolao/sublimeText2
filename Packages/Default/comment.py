@@ -210,5 +210,16 @@ class ToggleCommentCommand(sublime_plugin.TextCommand):
                 self.remove_line_comment(self.view, edit, comment_data, region)
                 continue
 
+            has_line_comment = len(comment_data[0]) > 0
+
+            if not has_line_comment and not block and region.empty():
+                # Use block comments to comment out the line
+                line = self.view.line(region.a)
+                line = sublime.Region(
+                    advance_to_first_non_white_space_on_line(self.view, line.a),
+                    line.b)
+                self.add_comment(self.view, edit, comment_data, block, line)
+                continue
+
             # Add a comment instead
             self.add_comment(self.view, edit, comment_data, block, region)

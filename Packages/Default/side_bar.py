@@ -26,7 +26,7 @@ class NewFolderCommand(sublime_plugin.WindowCommand):
         self.window.show_input_panel("Folder Name:", "", functools.partial(self.on_done, dirs[0]), None, None)
 
     def on_done(self, dir, name):
-        os.mkdir(os.path.join(dir, name))
+        os.makedirs(os.path.join(dir, name))
 
     def is_visible(self, dirs):
         return len(dirs) == 1

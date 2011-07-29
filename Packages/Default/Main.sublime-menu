@@ -236,7 +236,7 @@
         "id": "selection",
         "children":
         [
-            { "command": "expand_selection", "args": {"to": "word"}, "caption": "Select More" },
+            { "command": "find_under_expand", "caption": "Select More" },
             { "command": "split_selection_into_lines", "caption": "Split into Lines" },
             { "command": "select_lines", "args": {"forward": false}, "caption": "Add Previous Line" },
             { "command": "select_lines", "args": {"forward": true}, "caption": "Add Next Line" },
@@ -585,6 +585,7 @@
             },
             { "caption": "-" },
             { "command": "new_plugin", "caption": "New Plugin…" },
+            { "command": "new_snippet", "caption": "New Snippet…" },
             { "caption": "-", "id": "end" }
         ]
     },
@@ -633,6 +634,14 @@
             { "caption": "-" },
             { "command": "open_file", "args": {"file": "${packages}/Default/Base File.sublime-settings"}, "caption": "Default File Settings" },
             { "command": "open_file", "args": {"file": "${packages}/User/Base File.sublime-settings"}, "caption": "User File Settings" },
+            {
+                "caption": "More",
+                "children":
+                [
+                    { "command": "open_file_settings", "caption": "User Syntax Specific Settings" },
+                    { "command": "open_file", "args": {"file": "${packages}/User/Distraction Free.sublime-settings"}, "caption": "User Distraction Free Settings" }
+                ]
+            },
             { "caption": "-" },
             { "command": "open_file", "args": {"file": "${packages}/Default/Global.sublime-settings"}, "caption": "Default Global Settings" },
             { "command": "open_file", "args": {"file": "${packages}/User/Global.sublime-settings"}, "caption": "User Global Settings" },

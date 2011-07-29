@@ -14,7 +14,7 @@
 	"font_size": 10,
 
 	// Valid options are "bold", "italic", "no_antialias", "gray_antialias",
-	// and "subpixel_antialias"
+	// and "subpixel_antialias".
 	"font_options": [],
 
 	// Characters that are considered to separate words
@@ -73,13 +73,16 @@
 	// the color scheme
 	"draw_minimap_border": false,
 
-	// Set to false to disable highlighting any line with a cursor
-	"highlight_line": true,
+	// Set to false to disable highlighting any line with a caret
+	"highlight_line": false,
 
-	// Set to false to disable underlining the brackets surrounding the cursor
+	// Valid values are "smooth", "phase", "blink", "wide" and "solid".
+	"caret_style": "smooth",
+
+	// Set to false to disable underlining the brackets surrounding the caret
 	"match_brackets": true,
 
-	// Set to false if you'd rather only highlight the brackets when the cursor is
+	// Set to false if you'd rather only highlight the brackets when the caret is
 	// next to one
 	"match_brackets_content": true,
 

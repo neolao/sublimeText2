@@ -342,7 +342,8 @@
 				</dict>
 			</dict>
 			<key>match</key>
-			<string>(\w+?)\.(\w+)</string>
+			<string>\b(\w+?)\.(\w+)\b</string>
+			<!-- <string>(\w+?)\.(\w+)</string> -->
 		</dict>
 		<dict>
 			<key>include</key>
