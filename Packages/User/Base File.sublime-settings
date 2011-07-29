@@ -7,5 +7,8 @@
 	"font_size": 14,
 	"tab_completion": false,
 	"translate_tabs_to_spaces": true,
-	"word_wrap": false
+	"word_wrap": false,
+    "highlight_line": true,
+    "tab_completion": false,
+    "shift_tab_unindent": true
 }
