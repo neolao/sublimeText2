@@ -545,9 +545,11 @@
 			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
 		]
 	},
-	{ "keys": ["alt+p"], "command": "toggle_preserve_case", "context":
+	{ "keys": ["alt+a"], "command": "toggle_preserve_case", "context":
 		[
 			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
 		]
-	}
+	},
+
+	{ "keys": ["context_menu"], "command": "context_menu" }
 ]

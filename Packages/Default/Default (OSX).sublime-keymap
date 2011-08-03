@@ -505,13 +505,16 @@ and don't need to be repeated here. Anything listed here will take precedence, h
 			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
 		]
 	},
-	{ "keys": ["super+alt+p"], "command": "toggle_preserve_case", "context":
+	{ "keys": ["super+alt+a"], "command": "toggle_preserve_case", "context":
 		[
 			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
 		]
 	},
 
 	{ "keys": ["super+alt+o"], "command": "toggle_overwrite" },
+	
+	{ "keys": ["alt+f2"], "command": "context_menu" },
+
 	{ "keys": ["super+,"], "command": "open_file", "args": {"file": "${packages}/User/Base File.sublime-settings"} },
 
 	// These are OS X builtin commands, and don't need to be listed here, but

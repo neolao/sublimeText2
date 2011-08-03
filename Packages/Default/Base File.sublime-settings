@@ -42,6 +42,9 @@
 	// backspace insert/delete up to the next tabstop
 	"use_tab_stops": true,
 
+	// Set to false to disable detection of tabs vs. spaces on load
+	"detect_indentation": true,
+
 	// Set to false to disable automatic indentation
 	"auto_indent": true,
 
@@ -97,9 +100,6 @@
 	// Set to false to not highlight angle brackets. This only takes effect if
 	// matchBrackets is true
 	"match_brackets_angle": false,
-
-	// Set to false to disable detection of tabs vs. spaces on load
-	"detect_indentation": true,
 
 	// Additional spacing at the top of each line, in pixels
 	"line_padding_top": 0,
