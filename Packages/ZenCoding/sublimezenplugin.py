@@ -2,6 +2,9 @@
 #coding: utf8
 #################################### IMPORTS ###################################
 
+# Std Libs
+# import operator
+
 # Sublime Libs
 import sublime
 import sublime_plugin
@@ -67,6 +70,20 @@ __authors__     = ['"Sergey Chikuyonok" <serge.che@gmail.com>'
 
 zen_settings = sublime.load_settings('zen-coding.sublime-settings')
 
+
+# OPMAP = {
+#     sublime.OP_EQUAL     : operator.eq,
+#     sublime.OP_NOT_EQUAL : operator.ne,
+# }
+
+# def eval_op(op, operand, operand2):
+#     return OPMAP[op](operand, operand2)
+
+# class ZenSettings(sublime_plugin.EventListener):
+#     def on_query_context(self, view, key, op, operand, match_all):
+#         if key.startswith('zen_setting'):
+#             return eval_op(op, operand, zen_settings.get(key.split('.')[1]))
+
 ##################################### TODO #####################################
 """
 
@@ -77,6 +94,7 @@ Installation Docs
     OSX
     Windows
     Linux
+
 """
 #################################### LOGGING ###################################
 
@@ -98,12 +116,13 @@ def load_settings(force_reload=False):
             debug('loading my_zen_settings from zen-settings.sublime-settings')
             zcr.set_vocabulary(my_zen_settings, zcr.VOC_USER)
             assert zcr.vocabularies[zcr.VOC_USER] is my_zen_settings
+
 load_settings()
 
 if int(sublime.version()) >= 2092:
     zen_settings.clear_on_change('zen_coding')
-    zen_settings.add_on_change( 'zen_coding', 
-                                lambda: load_settings(force_reload=1) )
+    zen_settings.add_on_change('zen_coding',
+                               lambda: load_settings(force_reload=1))
 
 ######################## REMOVE HTML/HTML_COMPLETIONS.PY #######################
 
@@ -116,12 +135,17 @@ def remove_html_completions():
         return
 
     completions = sublime_plugin.all_callbacks['on_query_completions']
-    if hc in completions: completions.remove(hc)
-    debug('on_query_completion: %r' % completions)
+
+    if hc in completions:
+        debug('on_query_completion: removing: %s' % hc)
+        completions.remove(hc)
+
+    debug('on_query_completion: callbacks: %r' % completions)
 
 sublime.set_timeout(remove_html_completions, 2000)
 
 ########################## DYNAMIC ZEN CODING SNIPPETS #########################
+
 
 class ZenAsYouType(CommandsAsYouTypeBase):
     default_input = 'div'
@@ -253,7 +277,9 @@ class ZenListener(sublime_plugin.EventListener):
         return [(prefix, '@=' + v, v) for v in values]
 
     def on_query_completions(self, view, prefix, locations):
-        if not self.correct_syntax(view): return []
+        if ( not self.correct_syntax(view) or
+             zen_settings.get('disable_completions', False) ): return []
+
         black_list = zen_settings.get('completions_blacklist', [])
 
         # We need to use one function rather than discrete listeners so as to
@@ -301,7 +327,7 @@ class ZenListener(sublime_plugin.EventListener):
 
                 if result:
                     return [
-                        (abbr, result if '<' not in result else abbr, result)]
+                        (abbr, abbr, result)]
 
         except ZenInvalidAbbreviation:
             pass
@@ -312,7 +338,7 @@ class ZenListener(sublime_plugin.EventListener):
         # TODO, before or after this, fuzz directly against the zen snippets
         # eg  `tjd` matching `tj:d` to expand `text-justify:distribute;`
 
-        if ( view.match_selector(pos, CSS_PROPERTY) and 
+        if ( view.match_selector(pos, CSS_PROPERTY) and
              not 'css_properties' in black_list ):
 
             # Use this to get non \w based prefixes

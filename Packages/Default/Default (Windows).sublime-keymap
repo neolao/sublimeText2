@@ -9,7 +9,7 @@
 	{ "keys": ["ctrl+f4"], "command": "close_file" },
 	{ "keys": ["ctrl+w"], "command": "close" },
 
-	{ "keys": ["ctrl+b"], "command": "toggle_side_bar" },
+	{ "keys": ["ctrl+k", "ctrl+b"], "command": "toggle_side_bar" },
 	{ "keys": ["f11"], "command": "toggle_full_screen" },
 	{ "keys": ["shift+f11"], "command": "toggle_distraction_free" },
 
@@ -146,6 +146,11 @@
 	},
 	{ "keys": ["shift+tab"], "command": "unindent", "context":
 		[
+			{ "key": "preceding_text", "operator": "regex_match", "operand": "^[\t ]*" }
+		]
+	},
+	{ "keys": ["shift+tab"], "command": "unindent", "context":
+		[
 			{ "key": "text", "operator": "regex_contains", "operand": "\n" }
 		]
 	},
@@ -170,6 +175,10 @@
 	{ "keys": ["ctrl+shift+space"], "command": "expand_selection", "args": {"to": "scope"} },
 	{ "keys": ["ctrl+shift+m"], "command": "expand_selection", "args": {"to": "brackets"} },
 	{ "keys": ["ctrl+m"], "command": "move_to", "args": {"to": "brackets"} },
+	{ "keys": ["ctrl+shift+j"], "command": "expand_selection", "args": {"to": "indentation"} },
+	{ "keys": ["ctrl+shift+a"], "command": "expand_selection", "args": {"to": "tag"} },
+
+	{ "keys": ["alt+."], "command": "close_tag" },
 
 	{ "keys": ["ctrl+q"], "command": "toggle_record_macro" },
 	{ "keys": ["ctrl+shift+q"], "command": "run_macro" },
@@ -177,7 +186,7 @@
 	{ "keys": ["ctrl+enter"], "command": "run_macro_file", "args": {"file": "Packages/Default/Add Line.sublime-macro"} },
 	{ "keys": ["ctrl+shift+enter"], "command": "run_macro_file", "args": {"file": "Packages/Default/Add Line Before.sublime-macro"} },
 
-	{ "keys": ["ctrl+p"], "command": "show_overlay", "args": {"overlay": "goto"} },
+	{ "keys": ["ctrl+p"], "command": "show_overlay", "args": {"overlay": "goto", "show_files": true} },
 	{ "keys": ["ctrl+shift+p"], "command": "show_overlay", "args": {"overlay": "command_palette"} },
 	{ "keys": ["ctrl+alt+p"], "command": "prompt_select_project" },
 	{ "keys": ["ctrl+r"], "command": "show_overlay", "args": {"overlay": "goto", "text": "@"} },
@@ -227,6 +236,7 @@
 
 	{ "keys": ["ctrl+alt+shift+p"], "command": "show_scope_name" },
 
+	{ "keys": ["ctrl+b"], "command": "build" },
 	{ "keys": ["f7"], "command": "build" },
 	{ "keys": ["ctrl+break"], "command": "exec", "args": {"kill": true} },
 
@@ -530,6 +540,23 @@
 
 	{ "keys": ["alt+shift+w"], "command": "insert_snippet", "args": { "name": "Packages/XML/long-tag.sublime-snippet" } },
 
+	{ "keys": ["ctrl+shift+["], "command": "fold" },
+	{ "keys": ["ctrl+shift+]"], "command": "unfold" },
+	{ "keys": ["ctrl+k", "ctrl+1"], "command": "fold_by_level", "args": {"level": 1} },
+	{ "keys": ["ctrl+k", "ctrl+2"], "command": "fold_by_level", "args": {"level": 2} },
+	{ "keys": ["ctrl+k", "ctrl+3"], "command": "fold_by_level", "args": {"level": 3} },
+	{ "keys": ["ctrl+k", "ctrl+4"], "command": "fold_by_level", "args": {"level": 4} },
+	{ "keys": ["ctrl+k", "ctrl+5"], "command": "fold_by_level", "args": {"level": 5} },
+	{ "keys": ["ctrl+k", "ctrl+6"], "command": "fold_by_level", "args": {"level": 6} },
+	{ "keys": ["ctrl+k", "ctrl+7"], "command": "fold_by_level", "args": {"level": 7} },
+	{ "keys": ["ctrl+k", "ctrl+8"], "command": "fold_by_level", "args": {"level": 8} },
+	{ "keys": ["ctrl+k", "ctrl+9"], "command": "fold_by_level", "args": {"level": 9} },
+	{ "keys": ["ctrl+k", "ctrl+0"], "command": "unfold_all" },
+	{ "keys": ["ctrl+k", "ctrl+j"], "command": "unfold_all" },
+	{ "keys": ["ctrl+k", "ctrl+t"], "command": "fold_tag_attributes" },
+
+	{ "keys": ["context_menu"], "command": "context_menu" },
+
 	{ "keys": ["alt+c"], "command": "toggle_case_sensitive", "context":
 		[
 			{ "key": "setting.is_widget", "operator": "equal", "operand": true }
@@ -551,5 +578,39 @@
 		]
 	},
 
-	{ "keys": ["context_menu"], "command": "context_menu" }
+	// Find panel key bindings
+	{ "keys": ["enter"], "command": "find_next", "context":
+		[{"key": "panel", "operand": "find"}, {"key": "panel_has_focus"}]
+	},
+	{ "keys": ["shift+enter"], "command": "find_prev", "context":
+		[{"key": "panel", "operand": "find"}, {"key": "panel_has_focus"}]
+	},
+	{ "keys": ["alt+enter"], "command": "find_all", "args": {"close_panel": true},
+		 "context": [{"key": "panel", "operand": "find"}, {"key": "panel_has_focus"}]
+	},
+
+	// Replace panel key bindings
+	{ "keys": ["enter"], "command": "find_next", "context":
+		[{"key": "panel", "operand": "replace"}, {"key": "panel_has_focus"}]
+	},
+	{ "keys": ["shift+enter"], "command": "find_prev", "context":
+		[{"key": "panel", "operand": "replace"}, {"key": "panel_has_focus"}]
+	},
+	{ "keys": ["alt+enter"], "command": "find_all", "args": {"close_panel": true},
+		"context": [{"key": "panel", "operand": "replace"}, {"key": "panel_has_focus"}]
+	},
+	{ "keys": ["ctrl+alt+enter"], "command": "replace_all", "args": {"close_panel": true},
+		 "context": [{"key": "panel", "operand": "replace"}, {"key": "panel_has_focus"}]
+	},
+
+	// Incremental find panel key bindings
+	{ "keys": ["enter"], "command": "hide_panel", "context":
+		[{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]
+	},
+	{ "keys": ["shift+enter"], "command": "find_prev", "context":
+		[{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]
+	},
+	{ "keys": ["alt+enter"], "command": "find_all", "args": {"close_panel": true},
+		"context": [{"key": "panel", "operand": "incremental_find"}, {"key": "panel_has_focus"}]
+	}
 ]

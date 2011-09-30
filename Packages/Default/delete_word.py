@@ -7,72 +7,58 @@ def clamp(xmin, x, xmax):
         return xmax
     return x;
 
-def classify(char, charsets):
-    if len(char) == 0:
-        return -2
-
-    for i in xrange(0, len(charsets)):
-        if char in charsets[i]:
-            return i
-    return -1
-
 class DeleteWordCommand(sublime_plugin.TextCommand):
 
-    def expand_word(self, view, pos, forward):
+    def find_by_class(self, pt, classes, forward):
         if forward:
             delta = 1
-            end_position = view.line(pos).b
+            end_position = self.view.size()
+            if pt > end_position:
+                pt = end_position
         else:
             delta = -1
-            end_position = view.line(pos).a
+            end_position = 0
+            if pt < end_position:
+                pt = end_position
 
-        txt = view.substr(sublime.Region(pos, end_position))
-        if not forward:
-            txt = txt[::-1]
+        while pt != end_position:
+            if self.view.classify(pt) & classes != 0:
+                return pt
+            pt += delta
 
-        if len(txt) == 0:
-            return sublime.Region(pos, pos + delta)
+        return pt
 
-        classes = [" \t", view.settings().get("word_separators"), "\n"]
+    def expand_word(self, view, pos, classes, forward):
+        if forward:
+            delta = 1
+        else:
+            delta = -1
+        ws = ["\t", " "]
 
-        prev_cls = classify(view.substr(sublime.Region(pos, pos - delta)), classes)
+        if forward:
+            if view.substr(pos) in ws and view.substr(pos + 1) in ws:
+                classes = sublime.CLASS_WORD_START | sublime.CLASS_PUNCTUATION_START | sublime.CLASS_LINE_END
+        else:
+            if view.substr(pos - 1) in ws and view.substr(pos - 2) in ws:
+                classes = sublime.CLASS_WORD_END | sublime.CLASS_PUNCTUATION_END | sublime.CLASS_LINE_START
 
-        count = 1
+        return sublime.Region(pos, self.find_by_class(pos + delta, classes, forward))
 
-        cls = classify(txt[0], classes)
+    def run(self, edit, forward = True, sub_words = False):
 
-        at_boundary = (prev_cls != cls)
+        if forward:
+            classes = sublime.CLASS_WORD_END | sublime.CLASS_PUNCTUATION_END | sublime.CLASS_LINE_START
+            if sub_words:
+                classes |= sublime.CLASS_SUB_WORD_END
+        else:
+            classes = sublime.CLASS_WORD_START | sublime.CLASS_PUNCTUATION_START | sublime.CLASS_LINE_END
+            if sub_words:
+                classes |= sublime.CLASS_SUB_WORD_START
 
-        did_eat_extra_space = False
-        if cls == 0 and len(txt) > 1 and at_boundary:
-            next_cls = classify(txt[1], classes)
-            if next_cls != 0:
-                # First character is a space, and the following character is not.
-                # Eat the space and the following word, not just the space
-                cls = next_cls
-                count += 1
-                did_eat_extra_space = True
-
-        for i in xrange(count, len(txt)):
-            if classify(txt[i], classes) == cls:
-                count += 1
-            else:
-                break
-
-        # If there's a single space after the word, eat that too
-        if not did_eat_extra_space and len(txt) > count and at_boundary:
-            is_single_trailing_space = ((classify(txt[count], classes) == 0)
-                and (count + 1 == len(txt) or classify(txt[count + 1], classes) != 0))
-            if is_single_trailing_space:
-                count += 1
-
-        return sublime.Region(pos, pos + delta * count)
-
-    def run(self, edit, forward = True):
         new_sels = []
         for s in reversed(self.view.sel()):
             if s.empty():
-                new_sels.append(self.expand_word(self.view, s.b, forward))
+                new_sels.append(self.expand_word(self.view, s.b, classes, forward))
 
         sz = self.view.size()
         for s in new_sels:

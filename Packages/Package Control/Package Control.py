@@ -21,6 +21,42 @@ try:
 except (ImportError):
     pass
 
+class PanelPrinter():
+    instance = None
+
+    @classmethod
+    def get(cls):
+        if cls.instance == None:
+            cls.instance = PanelPrinter()
+        return cls.instance
+
+    def __init__(self):
+        self.name = 'package_control'
+        self.window = sublime.active_window()
+        self.panel  = self.window.get_output_panel(self.name)
+        self.panel.settings().set("word_wrap", True)
+        self.write('Package Control Messages\n========================')
+
+    def show(self):
+        sublime.set_timeout(self.show_callback, 0)
+
+    def show_callback(self):
+        self.window.run_command("show_panel", {"panel": "output." + self.name})
+
+    def write(self, string):
+        callback = lambda: self.write_callback(string)
+        sublime.set_timeout(callback, 0)
+
+    def write_callback(self, string):
+        self.panel.set_read_only(False)
+        edit = self.panel.begin_edit()
+
+        self.panel.insert(edit, self.panel.size(), string)
+        self.panel.show(self.panel.size())
+        self.panel.end_edit(edit)
+        self.panel.set_read_only(True)
+
+
 class ThreadProgress():
     def __init__(self, thread, message, success_message):
         self.thread = thread
@@ -294,6 +330,9 @@ class NonCleanExitError(Exception):
 
 
 class CliDownloader():
+    def __init__(self, settings):
+        self.settings = settings
+
     def find_binary(self, name):
         dirs = ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin',
             '/sbin', '/bin']
@@ -318,7 +357,21 @@ class CliDownloader():
 
 
 class UrlLib2Downloader():
+    def __init__(self, settings):
+        self.settings = settings
+
     def download(self, url, error_message, timeout, tries):
+        if self.settings.get('http_proxy') or self.settings.get('https_proxy'):
+            proxies = {}
+            if self.settings.get('http_proxy'):
+                proxies['http'] = self.settings.get('http_proxy')
+                if not self.settings.get('https_proxy'):
+                    proxies['https'] = self.settings.get('http_proxy')
+            if self.settings.get('https_proxy'):
+                proxies['https'] = self.settings.get('https_proxy')
+            proxy_handler = urllib2.ProxyHandler(proxies)
+            urllib2.install_opener(urllib2.build_opener(proxy_handler))
+
         while tries > 0:
             tries -= 1
             try:
@@ -346,12 +399,19 @@ class UrlLib2Downloader():
 
 
 class WgetDownloader(CliDownloader):
-    def __init__(self):
-        self.binary = self.find_binary('wget')
-
     def download(self, url, error_message, timeout, tries):
-        command = [self.binary, '--timeout', str(int(timeout)), '-o',
+        wget = self.find_binary('wget')
+        if not wget:
+            return False
+        command = [wget, '--timeout', str(int(timeout)), '-o',
             '/dev/null', '-O', '-', '-U', 'Sublime Package Control', url]
+
+        if self.settings.get('http_proxy'):
+            os.putenv('http_proxy', self.settings.get('http_proxy'))
+            if not self.settings.get('https_proxy'):
+                os.putenv('https_proxy', self.settings.get('http_proxy'))
+        if self.settings.get('https_proxy'):
+            os.putenv('https_proxy', self.settings.get('https_proxy'))
 
         while tries > 1:
             tries -= 1
@@ -377,15 +437,19 @@ class WgetDownloader(CliDownloader):
 
 
 class CurlDownloader(CliDownloader):
-    def __init__(self):
-        self.binary = self.find_binary('curl')
-
     def download(self, url, error_message, timeout, tries):
         curl = self.find_binary('curl')
         if not curl:
             return False
         command = [curl, '-f', '--user-agent', 'Sublime Package Control',
             '--connect-timeout', str(int(timeout)), '-s', url]
+
+        if self.settings.get('http_proxy'):
+            os.putenv('http_proxy', self.settings.get('http_proxy'))
+            if not self.settings.get('https_proxy'):
+                os.putenv('HTTPS_PROXY', self.settings.get('http_proxy'))
+        if self.settings.get('https_proxy'):
+            os.putenv('HTTPS_PROXY', self.settings.get('https_proxy'))
 
         while tries > 1:
             tries -= 1
@@ -490,7 +554,7 @@ class GitUpgrader(VcsUpgrader):
         if os.name == 'nt':
             name += '.exe'
         binary = self.find_binary(name)
-        if os.path.isdir(binary):
+        if binary and os.path.isdir(binary):
             full_path = os.path.join(binary, name)
             if os.path.exists(full_path):
                 binary = full_path
@@ -547,7 +611,7 @@ class HgUpgrader(VcsUpgrader):
         if os.name == 'nt':
             name += '.exe'
         binary = self.find_binary(name)
-        if os.path.isdir(binary):
+        if binary and os.path.isdir(binary):
             full_path = os.path.join(binary, name)
             if os.path.exists(full_path):
                 binary = full_path
@@ -594,6 +658,7 @@ class HgUpgrader(VcsUpgrader):
 
 class PackageManager():
     def __init__(self):
+        self.printer = PanelPrinter.get()
         # Here we manually copy the settings since sublime doesn't like
         # code accessing settings from threads
         self.settings = {}
@@ -603,7 +668,8 @@ class PackageManager():
                 'package_destination', 'cache_length', 'auto_upgrade',
                 'files_to_ignore_binary', 'files_to_keep', 'dirs_to_keep',
                 'git_binary', 'git_update_command', 'hg_binary',
-                'hg_update_command']:
+                'hg_update_command', 'http_proxy', 'https_proxy',
+                'auto_upgrade_ignore', 'auto_upgrade_frequency']:
             if settings.get(setting) == None:
                 continue
             self.settings[setting] = settings.get(setting)
@@ -618,11 +684,11 @@ class PackageManager():
         is_ssl = re.search('^https://', url) != None
 
         if (is_ssl and has_ssl) or not is_ssl:
-            downloader = UrlLib2Downloader()
+            downloader = UrlLib2Downloader(self.settings)
         else:
             for downloader_class in [CurlDownloader, WgetDownloader]:
                 try:
-                    downloader = downloader_class()
+                    downloader = downloader_class(self.settings)
                     break
                 except (BinaryNotFoundError):
                     pass
@@ -853,13 +919,10 @@ class PackageManager():
         pristine_package_path = os.path.join(os.path.dirname(
             sublime.packages_path()), 'Pristine Packages', package_filename)
 
-        package_bytes = self.download_url(url, 'Error downloading package.')
-        if package_bytes == False:
-            return False
-        with open(package_path, "wb") as package_file:
-            package_file.write(package_bytes)
-
         package_dir = self.get_package_dir(package_name)
+
+        package_metadata_file = os.path.join(package_dir,
+            'package-metadata.json')
 
         if os.path.exists(os.path.join(package_dir, '.git')):
             return GitUpgrader(self.settings['git_binary'],
@@ -869,6 +932,17 @@ class PackageManager():
             return HgUpgrader(self.settings['hg_binary'],
                 self.settings['hg_update_command'], package_dir,
                 self.settings['cache_length']).run()
+
+        is_upgrade = os.path.exists(package_metadata_file)
+        old_version = None
+        if is_upgrade:
+            old_version = self.get_metadata(package_name).get('version')
+
+        package_bytes = self.download_url(url, 'Error downloading package.')
+        if package_bytes == False:
+            return False
+        with open(package_path, "wb") as package_file:
+            package_file.write(package_bytes)
 
         if not os.path.exists(package_dir):
             os.mkdir(package_dir)
@@ -963,8 +1037,8 @@ class PackageManager():
                         path)
         package_zip.close()
 
-        package_metadata_file = os.path.join(package_dir,
-            'package-metadata.json')
+        self.print_messages(package_name, package_dir, is_upgrade, old_version)
+
         with open(package_metadata_file, 'w') as f:
             metadata = {
                 "version": packages[package_name]['downloads'][0]['version'],
@@ -984,6 +1058,45 @@ class PackageManager():
         os.chdir(sublime.packages_path())
         return True
 
+    def print_messages(self, package, package_dir, is_upgrade, old_version):
+        messages_file = os.path.join(package_dir, 'messages.json')
+        if os.path.exists(messages_file):
+            messages_fp = open(messages_file, 'r')
+            message_info = json.load(messages_fp)
+            messages_fp.close()
+
+            shown = False
+            if not is_upgrade and message_info.get('install'):
+                install_messages = os.path.join(package_dir,
+                    message_info.get('install'))
+                message = '\n\n' + package + ':\n  '
+                with open(install_messages, 'r') as f:
+                    message += f.read().replace('\n', '\n  ')
+                self.printer.write(message)
+                shown = True
+
+            elif is_upgrade and old_version:
+                upgrade_messages = list(set(message_info.keys()) -
+                    set(['install']))
+                upgrade_messages = sorted(upgrade_messages,
+                    cmp=self.compare_versions, reverse=True)
+                for version in upgrade_messages:
+                    if self.compare_versions(old_version, version) >= 0:
+                        break
+                    if not shown:
+                        message = '\n\n' + package + ':'
+                        self.printer.write(message)
+                    upgrade_messages = os.path.join(package_dir,
+                        message_info.get(version))
+                    message = '\n  '
+                    with open(upgrade_messages, 'r') as f:
+                        message += f.read().replace('\n', '\n  ')
+                    self.printer.write(message)
+                    shown = True
+
+            if shown:
+                self.printer.show()
+
     def remove_package(self, package_name):
         installed_packages = self.list_packages()
 
@@ -1000,6 +1113,8 @@ class PackageManager():
         package_filename = package_name + '.sublime-package'
         package_path = os.path.join(sublime.installed_packages_path(),
             package_filename)
+        installed_package_path = os.path.join(os.path.dirname(
+            sublime.packages_path()), 'Installed Packages', package_filename)
         pristine_package_path = os.path.join(os.path.dirname(
             sublime.packages_path()), 'Pristine Packages', package_filename)
         package_dir = self.get_package_dir(package_name)
@@ -1010,6 +1125,15 @@ class PackageManager():
         except (OSError, IOError) as (exception):
             sublime.error_message(__name__ + ': An error occurred while' +
                 ' trying to remove the package file for %s. %s' %
+                (package_name, str(exception)))
+            return False
+
+        try:
+            if os.path.exists(installed_package_path):
+                os.remove(installed_package_path)
+        except (OSError, IOError) as (exception):
+            sublime.error_message(__name__ + ': An error occurred while' +
+                ' trying to remove the installed package file for %s. %s' %
                 (package_name, str(exception)))
             return False
 
@@ -1104,12 +1228,15 @@ class PackageInstaller():
     def __init__(self):
         self.manager = PackageManager()
 
-    def make_package_list(self, ignore_actions=[], override_action=None):
+    def make_package_list(self, ignore_actions=[], override_action=None,
+            ignore_packages=[]):
         packages = self.manager.list_available_packages()
         installed_packages = self.manager.list_packages()
 
         package_list = []
         for package in sorted(packages.iterkeys()):
+            if ignore_packages and package in ignore_packages:
+                continue
             package_entry = [package]
             info = packages[package]
             download = info['downloads'][0]
@@ -1452,7 +1579,7 @@ class RemovePackageThread(threading.Thread):
 
 class AddRepositoryChannelCommand(sublime_plugin.WindowCommand):
     def run(self):
-        self.window.show_input_panel('Repository Channel URL', '',
+        self.window.show_input_panel('Repository Channel JSON URL', '',
             self.on_done, self.on_change, self.on_cancel)
 
     def on_done(self, input):
@@ -1475,7 +1602,7 @@ class AddRepositoryChannelCommand(sublime_plugin.WindowCommand):
 
 class AddRepositoryCommand(sublime_plugin.WindowCommand):
     def run(self):
-        self.window.show_input_panel('Repository URL', '', self.on_done,
+        self.window.show_input_panel('GitHub or BitBucket Web URL, or Custom JSON Repository URL', '', self.on_done,
             self.on_change, self.on_cancel)
 
     def on_done(self, input):
@@ -1553,13 +1680,41 @@ class EnablePackageCommand(sublime_plugin.WindowCommand):
 class AutomaticUpgrader(threading.Thread):
     def __init__(self):
         self.installer = PackageInstaller()
-        self.auto_upgrade = PackageManager().settings.get('auto_upgrade')
+
+        settings = sublime.load_settings(__name__ + '.sublime-settings')
+        self.auto_upgrade = settings.get('auto_upgrade')
+        self.auto_upgrade_ignore = settings.get('auto_upgrade_ignore')
+
+        self.next_run = int(time.time())
+        self.last_run = settings.get('auto_upgrade_last_run')
+        frequency = settings.get('auto_upgrade_frequency')
+        if frequency:
+            if self.last_run:
+                self.next_run = int(self.last_run) + (frequency * 60 * 60)
+            else:
+                self.next_run = time.time()
+
+        if self.auto_upgrade and self.next_run <= time.time():
+            settings.set('auto_upgrade_last_run', int(time.time()))
+            sublime.save_settings(__name__ + '.sublime-settings')
+
         threading.Thread.__init__(self)
 
     def run(self):
+        if self.next_run > time.time():
+            last_run = datetime.datetime.fromtimestamp(self.last_run)
+            next_run = datetime.datetime.fromtimestamp(self.next_run)
+            date_format = '%Y-%m-%d %H:%M:%S'
+            print (__name__ + ': Skipping automatic upgrade, last run at ' +
+                '%s, next run at %s or after') % (last_run.strftime(
+                    date_format), next_run.strftime(date_format))
+            return
+
         if self.auto_upgrade:
             packages = self.installer.make_package_list(['install',
-                'reinstall', 'downgrade', 'overwrite', 'none'])
+                'reinstall', 'downgrade', 'overwrite', 'none'],
+                ignore_packages=self.auto_upgrade_ignore)
+
             if not packages:
                 print __name__ + ': No updated packages'
                 return
