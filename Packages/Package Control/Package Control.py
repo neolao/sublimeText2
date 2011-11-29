@@ -6,7 +6,6 @@ import sys
 import subprocess
 import zipfile
 import urllib2
-import hashlib
 import json
 import fnmatch
 import re
@@ -15,6 +14,7 @@ import datetime
 import time
 import shutil
 import _strptime
+import tempfile
 
 try:
     import ssl
@@ -32,27 +32,36 @@ class PanelPrinter():
 
     def __init__(self):
         self.name = 'package_control'
-        self.window = sublime.active_window()
-        self.panel  = self.window.get_output_panel(self.name)
-        self.panel.settings().set("word_wrap", True)
-        self.write('Package Control Messages\n========================')
+        self.window = None
+        self.init()
+
+    def init(self):
+        if self.window == None and sublime.active_window() != None:
+            self.window = sublime.active_window()
+            self.panel  = self.window.get_output_panel(self.name)
+            if self.panel.size() == 0:
+                self.panel.settings().set("word_wrap", True)
+                self.write_callback('Package Control Messages\n' +
+                    '========================')
 
     def show(self):
-        sublime.set_timeout(self.show_callback, 0)
+        sublime.set_timeout(self.show_callback, 10)
 
     def show_callback(self):
         self.window.run_command("show_panel", {"panel": "output." + self.name})
 
     def write(self, string):
         callback = lambda: self.write_callback(string)
-        sublime.set_timeout(callback, 0)
+        sublime.set_timeout(callback, 10)
 
     def write_callback(self, string):
+        if self.window == None:
+            self.init()
+
         self.panel.set_read_only(False)
         edit = self.panel.begin_edit()
 
         self.panel.insert(edit, self.panel.size(), string)
-        self.panel.show(self.panel.size())
         self.panel.end_edit(edit)
         self.panel.set_read_only(True)
 
@@ -171,11 +180,12 @@ class PackageProvider():
 
 class GitHubPackageProvider():
     def match_url(self, url):
-        return re.search('^https?://github.com/[^/]+/[^/]+$', url) != None
+        return re.search('^https?://github.com/[^/]+/[^/]+/?$', url) != None
 
     def get_packages(self, repo, package_manager):
         api_url = re.sub('^https?://github.com/',
             'https://api.github.com/repos/', repo)
+        api_url = api_url.rstrip('/')
         repo_json = package_manager.download_url(api_url,
             'Error downloading repository.')
         if repo_json == False:
@@ -184,7 +194,7 @@ class GitHubPackageProvider():
             repo_info = json.loads(repo_json)
         except (ValueError):
             sublime.error_message(__name__ + ': Error parsing JSON from ' +
-                ' repository ' + repo + '.')
+                ' repository ' + api_url + '.')
             return False
 
         commit_date = repo_info['pushed_at']
@@ -215,11 +225,12 @@ class GitHubPackageProvider():
 
 class GitHubUserProvider():
     def match_url(self, url):
-        return re.search('^https?://github.com/[^/]+$', url) != None
+        return re.search('^https?://github.com/[^/]+/?$', url) != None
 
     def get_packages(self, url, package_manager):
         api_url = re.sub('^https?://github.com/',
-            'https://api.github.com/users/', url) + '/repos'
+            'https://api.github.com/users/', url)
+        api_url = api_url.rstrip('/') + '/repos'
         repo_json = package_manager.download_url(api_url,
             'Error downloading repository.')
         if repo_json == False:
@@ -228,7 +239,7 @@ class GitHubUserProvider():
             repo_info = json.loads(repo_json)
         except (ValueError):
             sublime.error_message(__name__ + ': Error parsing JSON from ' +
-                ' repository ' + repo + '.')
+                ' repository ' + api_url + '.')
             return False
 
         packages = {}
@@ -267,6 +278,7 @@ class BitBucketPackageProvider():
     def get_packages(self, repo, package_manager):
         api_url = re.sub('^https?://bitbucket.org/',
             'https://api.bitbucket.org/1.0/repositories/', repo)
+        api_url = api_url.rstrip('/')
         repo_json = package_manager.download_url(api_url,
             'Error downloading repository.')
         if repo_json == False:
@@ -275,20 +287,21 @@ class BitBucketPackageProvider():
             repo_info = json.loads(repo_json)
         except (ValueError):
             sublime.error_message(__name__ + ': Error parsing JSON from ' +
-                ' repository ' + repo + '.')
+                ' repository ' + api_url + '.')
             return False
 
-        changeset_json = package_manager.download_url(api_url + \
-            '/changesets/?limit=1', 'Error downloading repository.')
+        changeset_url = api_url + '/changesets/default'
+        changeset_json = package_manager.download_url(changeset_url,
+            'Error downloading repository.')
         if changeset_json == False:
             return False
         try:
             last_commit = json.loads(changeset_json)
         except (ValueError):
             sublime.error_message(__name__ + ': Error parsing JSON from ' +
-                ' repository ' + repo + '.')
+                ' repository ' + changeset_url + '.')
             return False
-        commit_date = last_commit['changesets'][0]['timestamp']
+        commit_date = last_commit['timestamp']
         timestamp = datetime.datetime.strptime(commit_date[0:19],
             '%Y-%m-%d %H:%M:%S')
         utc_timestamp = timestamp.strftime(
@@ -306,7 +319,7 @@ class BitBucketPackageProvider():
                 {
                     'version': utc_timestamp,
                     'url': repo + '/get/' + \
-                        last_commit['changesets'][0]['node'] + '.zip'
+                        last_commit['node'] + '.zip'
                 }
             ]
         }
@@ -341,7 +354,7 @@ class CliDownloader():
             if os.path.exists(path):
                 return path
 
-        raise BinaryNotFoundError('The binary ' + name + ' could not be ' + \
+        raise BinaryNotFoundError('The binary ' + name + ' could not be ' +
             'located')
 
     def execute(self, args):
@@ -351,7 +364,9 @@ class CliDownloader():
         output = proc.stdout.read()
         returncode = proc.wait()
         if returncode != 0:
-            raise NonCleanExitError(returncode)
+            error = NonCleanExitError(returncode)
+            error.output = output
+            raise error
         return output
 
 
@@ -381,6 +396,11 @@ class UrlLib2Downloader():
                 return http_file.read()
 
             except (urllib2.HTTPError) as (e):
+                # Bitbucket and Github ratelimit using 503 a decent amount
+                if str(e.code) == '503':
+                    print (__name__ + ': Downloading %s was rate limited, ' +
+                        'trying again') % url
+                    continue
                 sublime.error_message(__name__ + ': ' + error_message +
                     ' HTTP error ' + str(e.code) + ' downloading ' +
                     url + '.')
@@ -388,7 +408,7 @@ class UrlLib2Downloader():
                 # Bitbucket and Github timeout a decent amount
                 if str(e.reason) == 'The read operation timed out' or \
                         str(e.reason) == 'timed out':
-                    print (__name__ + ': Downloading %s timed out, trying ' + \
+                    print (__name__ + ': Downloading %s timed out, trying ' +
                         'again') % url
                     continue
                 sublime.error_message(__name__ + ': ' + error_message +
@@ -399,12 +419,20 @@ class UrlLib2Downloader():
 
 
 class WgetDownloader(CliDownloader):
+    def __init__(self, settings):
+        self.settings = settings
+        self.wget = self.find_binary('wget')
+
+    def clean_tmp_file(self):
+        os.remove(self.tmp_file)
+
     def download(self, url, error_message, timeout, tries):
-        wget = self.find_binary('wget')
-        if not wget:
+        if not self.wget:
             return False
-        command = [wget, '--timeout', str(int(timeout)), '-o',
-            '/dev/null', '-O', '-', '-U', 'Sublime Package Control', url]
+
+        self.tmp_file = tempfile.NamedTemporaryFile().name
+        command = [self.wget, '--connect-timeout=' + str(int(timeout)), '-o',
+            self.tmp_file, '-O', '-', '-U', 'Sublime Package Control', url]
 
         if self.settings.get('http_proxy'):
             os.putenv('http_proxy', self.settings.get('http_proxy'))
@@ -416,33 +444,58 @@ class WgetDownloader(CliDownloader):
         while tries > 1:
             tries -= 1
             try:
-                return self.execute(command)
+                result = self.execute(command)
+                self.clean_tmp_file()
+                return result
             except (NonCleanExitError) as (e):
-                if e.returncode == 8:
-                    error_string = 'HTTP error 404'
-                elif e.returncode == 4:
-                    error_string = 'URL error host not found'
-                else:
-                    # GitHub and BitBucket seem to time out a lot
-                    print (__name__ + ': Downloading %s timed out, trying ' + \
-                        'again') % url
-                    continue
-                    #error_string = 'unknown connection error'
+                error_line = ''
+                with open(self.tmp_file) as f:
+                    for line in list(f):
+                        if re.search('ERROR[: ]|failed: ', line):
+                            error_line = line
+                            break
 
+                if e.returncode == 8:
+                    regex = re.compile('^.*ERROR (\d+):.*', re.S)
+                    if re.sub(regex, '\\1', error_line) == '503':
+                        # GitHub and BitBucket seem to rate limit via 503
+                        print (__name__ + ': Downloading %s was rate limited' +
+                            ', trying again') % url
+                        continue
+                    error_string = 'HTTP error ' + re.sub('^.*? ERROR ', '',
+                        error_line)
+
+                elif e.returncode == 4:
+                    error_string = re.sub('^.*?failed: ', '', error_line)
+                    # GitHub and BitBucket seem to time out a lot
+                    if error_string.find('timed out') != -1:
+                        print (__name__ + ': Downloading %s timed out, ' +
+                            'trying again') % url
+                        continue
+
+                else:
+                    error_string = re.sub('^.*?(ERROR[: ]|failed: )', '\\1',
+                        error_line)
+
+                error_string = re.sub('\\.?\s*\n\s*$', '', error_string)
                 sublime.error_message(__name__ + ': ' + error_message +
                     ' ' + error_string + ' downloading ' +
                     url + '.')
+            self.clean_tmp_file()
             break
         return False
 
 
 class CurlDownloader(CliDownloader):
+    def __init__(self, settings):
+        self.settings = settings
+        self.curl = self.find_binary('curl')
+
     def download(self, url, error_message, timeout, tries):
-        curl = self.find_binary('curl')
-        if not curl:
+        if not self.curl:
             return False
-        command = [curl, '-f', '--user-agent', 'Sublime Package Control',
-            '--connect-timeout', str(int(timeout)), '-s', url]
+        command = [self.curl, '-f', '--user-agent', 'Sublime Package Control',
+            '--connect-timeout', str(int(timeout)), '-sS', url]
 
         if self.settings.get('http_proxy'):
             os.putenv('http_proxy', self.settings.get('http_proxy'))
@@ -457,15 +510,22 @@ class CurlDownloader(CliDownloader):
                 return self.execute(command)
             except (NonCleanExitError) as (e):
                 if e.returncode == 22:
-                    error_string = 'HTTP error 404'
+                    code = re.sub('^.*?(\d+)\s*$', '\\1', e.output)
+                    if code == '503':
+                        # GitHub and BitBucket seem to rate limit via 503
+                        print (__name__ + ': Downloading %s was rate limited' +
+                            ', trying again') % url
+                        continue
+                    error_string = 'HTTP error ' + code
                 elif e.returncode == 6:
                     error_string = 'URL error host not found'
-                else:
+                elif e.returncode == 28:
                     # GitHub and BitBucket seem to time out a lot
-                    print (__name__ + ': Downloading %s timed out, trying ' + \
+                    print (__name__ + ': Downloading %s timed out, trying ' +
                         'again') % url
                     continue
-                    #error_string = 'unknown connection error'
+                else:
+                    error_string = e.output
 
                 sublime.error_message(__name__ + ': ' + error_message +
                     ' ' + error_string + ' downloading ' +
@@ -562,7 +622,7 @@ class GitUpgrader(VcsUpgrader):
             sublime.error_message(('%s: Unable to find %s. ' +
                 'Please set the git_binary setting by accessing the ' +
                 'Preferences > Package Settings > %s > ' +
-                'Settings – User menu entry. The Settings – Default entry ' +
+                u'Settings – User menu entry. The Settings – Default entry ' +
                 'can be used for reference, but changes to that will be ' +
                 'overwritten upon next upgrade.') % (__name__, name, __name__))
             return False
@@ -570,7 +630,7 @@ class GitUpgrader(VcsUpgrader):
         if os.name == 'nt':
             tortoise_plink = self.find_binary('TortoisePlink.exe')
             if tortoise_plink:
-                os.putenv('GIT_SSH', tortoise_plink)
+                os.environ.setdefault('GIT_SSH', tortoise_plink)
         return binary
 
     def run(self):
@@ -579,7 +639,7 @@ class GitUpgrader(VcsUpgrader):
             return False
         args = [binary]
         args.extend(self.update_command)
-        output = self.execute(args, self.working_copy)
+        self.execute(args, self.working_copy)
         return True
 
     def incoming(self):
@@ -619,7 +679,7 @@ class HgUpgrader(VcsUpgrader):
             sublime.error_message(('%s: Unable to find %s. ' +
                 'Please set the hg_binary setting by accessing the ' +
                 'Preferences > Package Settings > %s > ' +
-                'Settings – User menu entry. The Settings – Default entry ' +
+                u'Settings – User menu entry. The Settings – Default entry ' +
                 'can be used for reference, but changes to that will be ' +
                 'overwritten upon next upgrade.') % (__name__, name, __name__))
             return False
@@ -631,7 +691,7 @@ class HgUpgrader(VcsUpgrader):
             return False
         args = [binary]
         args.extend(self.update_command)
-        output = self.execute(args, self.working_copy)
+        self.execute(args, self.working_copy)
         return True
 
     def incoming(self):
@@ -751,8 +811,7 @@ class PackageManager():
         repositories = self.list_repositories()
         packages = {}
         downloaders = []
-        pending_downloaders = []
-        domain_downloaders = {}
+        grouped_downloaders = {}
 
         # Repositories are run in reverse order so that the ones first
         # on the list will overwrite those last on the list
@@ -771,29 +830,34 @@ class PackageManager():
                     self.settings.get('package_name_map', {}), repo)
                 domain = re.sub('^https?://[^/]*?(\w+\.\w+)($|/.*$)', '\\1',
                     repo)
+                if not grouped_downloaders.get(domain):
+                    grouped_downloaders[domain] = []
+                grouped_downloaders[domain].append(downloader)
+
+        def schedule(downloader, delay):
+            downloader.has_started = False
+            def inner():
+                downloader.start()
+                downloader.has_started = True
+            sublime.set_timeout(inner, delay)
+
+        for domain_downloaders in grouped_downloaders.values():
+            for i in range(len(domain_downloaders)):
+                downloader = domain_downloaders[i]
                 downloaders.append(downloader)
-                pending_downloaders.append([domain, downloader])
+                schedule(downloader, i * 150)
 
-        # Wait until all of the downloaders have completed
-        while True:
-            # Ensure there is only one downloader per domain at a time
-            for pending in pending_downloaders:
-                can_start = not pending[0] in domain_downloaders
-                can_start = can_start or \
-                    not domain_downloaders[pending[0]].is_alive()
-                if can_start:
-                    domain_downloaders[pending[0]] = pending[1]
-                    pending[1].start()
-                    pending_downloaders.remove(pending)
+        complete = []
 
-            is_alive = len(pending_downloaders) > 0
-            for downloader in downloaders:
-                is_alive = downloader.is_alive() or is_alive
-            if not is_alive:
-                break
-            time.sleep(0.01)
+        while downloaders:
+            downloader = downloaders.pop()
+            if downloader.has_started:
+                downloader.join()
+                complete.append(downloader)
+            else:
+                downloaders.insert(0, downloader)
 
-        for downloader in downloaders:
+        for downloader in complete:
             repository_packages = downloader.packages
             if repository_packages == False:
                 continue
@@ -901,7 +965,6 @@ class PackageManager():
         return True
 
     def install_package(self, package_name):
-        installed_packages = self.list_packages()
         packages = self.list_available_packages()
 
         if package_name not in packages.keys():
@@ -1258,59 +1321,61 @@ class PackageInstaller():
             vcs = None
             package_dir = self.manager.get_package_dir(package)
             settings = self.manager.settings
-            if os.path.exists(os.path.join(sublime.packages_path(), package,
-                    '.git')):
-                vcs = 'git'
-                incoming = GitUpgrader(settings.get('git_binary'),
-                    settings.get('git_update_command'), package_dir,
-                    settings.get('cache_length')).incoming()
-            elif os.path.exists(os.path.join(sublime.packages_path(), package,
-                    '.hg')):
-                vcs = 'hg'
-                incoming = HgUpgrader(settings.get('hg_binary'),
-                    settings.get('hg_update_command'), package_dir,
-                    settings.get('cache_length')).incoming()
-
-            if installed:
-                if not installed_version:
-                    if vcs:
-                        if incoming:
-                            action = 'pull'
-                            extra = ' with ' + vcs
-                        else:
-                            action = 'none'
-                            extra = ''
-                    else:
-                        action = 'overwrite'
-                        extra = ' %s with %s' % (installed_version_name,
-                            new_version)
-                else:
-                    res = self.manager.compare_versions(
-                        installed_version, download['version'])
-                    if res < 0:
-                        action = 'upgrade'
-                        extra = ' to %s from %s' % (new_version,
-                            installed_version_name)
-                    elif res > 0:
-                        action = 'downgrade'
-                        extra = ' to %s from %s' % (new_version,
-                            installed_version_name)
-                    else:
-                        action = 'reinstall'
-                        extra = ' %s' % new_version
-            else:
-                action = 'install'
-                extra = ' %s' % new_version
-            extra += ';'
-
-            if action in ignore_actions:
-                continue
 
             if override_action:
                 action = override_action
                 extra = ''
 
-            package_entry.append(info.get('description', 'No description ' + \
+            else:
+                if os.path.exists(os.path.join(sublime.packages_path(),
+                        package, '.git')):
+                    vcs = 'git'
+                    incoming = GitUpgrader(settings.get('git_binary'),
+                        settings.get('git_update_command'), package_dir,
+                        settings.get('cache_length')).incoming()
+                elif os.path.exists(os.path.join(sublime.packages_path(),
+                        package, '.hg')):
+                    vcs = 'hg'
+                    incoming = HgUpgrader(settings.get('hg_binary'),
+                        settings.get('hg_update_command'), package_dir,
+                        settings.get('cache_length')).incoming()
+
+                if installed:
+                    if not installed_version:
+                        if vcs:
+                            if incoming:
+                                action = 'pull'
+                                extra = ' with ' + vcs
+                            else:
+                                action = 'none'
+                                extra = ''
+                        else:
+                            action = 'overwrite'
+                            extra = ' %s with %s' % (installed_version_name,
+                                new_version)
+                    else:
+                        res = self.manager.compare_versions(
+                            installed_version, download['version'])
+                        if res < 0:
+                            action = 'upgrade'
+                            extra = ' to %s from %s' % (new_version,
+                                installed_version_name)
+                        elif res > 0:
+                            action = 'downgrade'
+                            extra = ' to %s from %s' % (new_version,
+                                installed_version_name)
+                        else:
+                            action = 'reinstall'
+                            extra = ' %s' % new_version
+                else:
+                    action = 'install'
+                    extra = ' %s' % new_version
+                extra += ';'
+
+                if action in ignore_actions:
+                    continue
+
+            package_entry.append(info.get('description', 'No description ' +
                 'provided'))
             package_entry.append(action + extra + ' ' +
                 re.sub('^https?://', '', info['url']))
@@ -1360,7 +1425,7 @@ class InstallPackageThread(threading.Thread, PackageInstaller):
                     'available for installation.')
                 return
             self.window.show_quick_panel(self.package_list, self.on_done)
-        sublime.set_timeout(show_quick_panel, 0)
+        sublime.set_timeout(show_quick_panel, 10)
 
 
 class DiscoverPackagesCommand(sublime_plugin.WindowCommand):
@@ -1385,7 +1450,7 @@ class DiscoverPackagesThread(threading.Thread, PackageInstaller):
                     'available for discovery.')
                 return
             self.window.show_quick_panel(self.package_list, self.on_done)
-        sublime.set_timeout(show_quick_panel, 0)
+        sublime.set_timeout(show_quick_panel, 10)
 
     def on_done(self, picked):
         if picked == -1:
@@ -1395,7 +1460,7 @@ class DiscoverPackagesThread(threading.Thread, PackageInstaller):
         def open_url():
             sublime.active_window().run_command('open_url',
                 {"url": packages.get(package_name).get('url')})
-        sublime.set_timeout(open_url, 0)
+        sublime.set_timeout(open_url, 10)
 
 
 class UpgradePackageCommand(sublime_plugin.WindowCommand):
@@ -1421,7 +1486,7 @@ class UpgradePackageThread(threading.Thread, PackageInstaller):
                     'ready for upgrade.')
                 return
             self.window.show_quick_panel(self.package_list, self.on_done)
-        sublime.set_timeout(show_quick_panel, 0)
+        sublime.set_timeout(show_quick_panel, 10)
 
     def on_done(self, picked):
         if picked == -1:
@@ -1475,12 +1540,15 @@ class ExistingPackagesCommand():
                 'No description provided'))
 
             version = metadata.get('version')
-            if not version and os.path.exists(os.path.join(package_dir, '.git')):
+            if not version and os.path.exists(os.path.join(package_dir,
+                    '.git')):
                 installed_version = 'git repository'
-            elif not version and os.path.exists(os.path.join(package_dir, '.hg')):
+            elif not version and os.path.exists(os.path.join(package_dir,
+                    '.hg')):
                 installed_version = 'hg repository'
             else:
-                installed_version = 'v' + version if version else 'unknown version'
+                installed_version = 'v' + version if version else \
+                    'unknown version'
 
             url = metadata.get('url')
             if url:
@@ -1514,7 +1582,7 @@ class ListPackagesThread(threading.Thread, ExistingPackagesCommand):
                     'to list.')
                 return
             self.window.show_quick_panel(self.package_list, self.on_done)
-        sublime.set_timeout(show_quick_panel, 0)
+        sublime.set_timeout(show_quick_panel, 10)
 
     def on_done(self, picked):
         if picked == -1:
@@ -1523,7 +1591,7 @@ class ListPackagesThread(threading.Thread, ExistingPackagesCommand):
         def open_dir():
             self.window.run_command('open_dir',
                 {"dir": os.path.join(sublime.packages_path(), package_name)})
-        sublime.set_timeout(open_dir, 0)
+        sublime.set_timeout(open_dir, 10)
 
 
 class RemovePackageCommand(sublime_plugin.WindowCommand,
@@ -1574,7 +1642,7 @@ class RemovePackageThread(threading.Thread):
             settings = sublime.load_settings('Global.sublime-settings')
             settings.set('ignored_packages', self.ignored_packages)
             sublime.save_settings('Global.sublime-settings')
-        sublime.set_timeout(unignore_package, 0)
+        sublime.set_timeout(unignore_package, 10)
 
 
 class AddRepositoryChannelCommand(sublime_plugin.WindowCommand):
@@ -1602,7 +1670,8 @@ class AddRepositoryChannelCommand(sublime_plugin.WindowCommand):
 
 class AddRepositoryCommand(sublime_plugin.WindowCommand):
     def run(self):
-        self.window.show_input_panel('GitHub or BitBucket Web URL, or Custom JSON Repository URL', '', self.on_done,
+        self.window.show_input_panel('GitHub or BitBucket Web URL, or Custom' +
+                ' JSON Repository URL', '', self.on_done,
             self.on_change, self.on_cancel)
 
     def on_done(self, input):
@@ -1649,7 +1718,7 @@ class DisablePackageCommand(sublime_plugin.WindowCommand):
         self.settings.set('ignored_packages', ignored_packages)
         sublime.save_settings('Global.sublime-settings')
         sublime.status_message('Package ' + package + ' successfully added ' +
-            'to list of diabled packges - restarting Sublime Text may be '
+            'to list of disabled packages - restarting Sublime Text may be '
             'required')
 
 
@@ -1673,7 +1742,7 @@ class EnablePackageCommand(sublime_plugin.WindowCommand):
             list(set(ignored) - set([package])))
         sublime.save_settings('Global.sublime-settings')
         sublime.status_message('Package ' + package + ' successfully removed' +
-            ' from list of diabled packages - restarting Sublime Text may be '
+            ' from list of disabled packages - restarting Sublime Text may be '
             'required')
 
 
@@ -1741,7 +1810,7 @@ class PackageCleanup(threading.Thread):
                 shutil.rmtree(package_dir)
                 print __name__ + ': Removed old directory for package %s' % \
                     path
-        sublime.set_timeout(lambda: AutomaticUpgrader().start(), 0)
+        sublime.set_timeout(lambda: AutomaticUpgrader().start(), 10)
 
 
 PackageCleanup().start()

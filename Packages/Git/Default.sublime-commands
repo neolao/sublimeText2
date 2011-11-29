@@ -1,0 +1,78 @@
+[
+    {
+        "caption": "Git: Blame",
+        "command": "git_blame"
+    }
+    ,{
+        "caption": "Git: Log Current File",
+        "command": "git_log"
+    }
+    ,{
+        "caption": "Git: Log All",
+        "command": "git_log_all"
+    }
+    ,{
+        "caption": "Git: Graph Current File",
+        "command": "git_graph"
+    }
+    ,{
+        "caption": "Git: Graph All",
+        "command": "git_graph_all"
+    }
+    ,{
+        "caption": "Git: Diff Current File",
+        "command": "git_diff"
+    }
+    ,{
+        "caption": "Git: Diff All",
+        "command": "git_diff_all"
+    }
+    ,{
+        "caption": "Git: Commit",
+        "command": "git_commit"
+    }
+    ,{
+        "caption": "Git: Quick Commit",
+        "command": "git_quick_commit"
+    }
+    ,{
+        "caption": "Git: Status",
+        "command": "git_status"
+    }
+    ,{
+        "caption": "Git: Change Branch",
+        "command": "git_branch"
+    }
+    ,{
+        "caption": "Git: Stash Changes",
+        "command": "git_stash"
+    }
+    ,{
+        "caption": "Git: Stash Pop",
+        "command": "git_stash_pop"
+    }
+    ,{
+        "caption": "Git: Add Current File",
+        "command": "git_add"
+    }
+    ,{
+        "caption": "Git: Add...",
+        "command": "git_add_choice"
+    }
+    ,{
+        "caption": "Git: Checkout Current File",
+        "command": "git_checkout"
+    }
+    ,{
+        "caption": "Git: Pull",
+        "command": "git_pull"
+    }
+    ,{
+        "caption": "Git: Push",
+        "command": "git_push"
+    }
+    ,{
+        "caption": "Git: Custom Command",
+        "command": "git_custom"
+    }
+]

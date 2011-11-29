@@ -573,7 +573,8 @@
       "operator": "equal",
       "match_all": true,
       "key": "selector"
-    }
+    },
+    {"operand": true, "operator": "equal", "key": "setting.auto_id_class"}
   ]
 },
 {
@@ -590,7 +591,8 @@
       "operand":   "text.html meta.tag -string -punctuation.definition.tag.begin.html -meta.scope.between-tag-pair.html -source -meta.tag.template.value.twig",
       "operator": "equal",
       "match_all": true
-    }
+    },
+    {"operand": true, "operator": "equal", "key": "setting.auto_id_class"}
   ]
 },
 {
@@ -613,7 +615,8 @@
       "operator": "regex_contains",
       "match_all": true,
       "key": "preceding_text"
-    }
+    },
+    {"operand": true, "operator": "equal", "key": "setting.auto_id_class"}
   ]
 },
 {
@@ -636,8 +639,8 @@
       "operator": "regex_contains",
       "match_all": true,
       "key": "preceding_text"
-    }
-
+    },
+    {"operand": true, "operator": "equal", "key": "setting.auto_id_class"}
   ]
 },
 {
