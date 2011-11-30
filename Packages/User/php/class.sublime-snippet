@@ -1,8 +1,14 @@
 <snippet>
     <content><![CDATA[/**
- * $1
+ * @package ${2:PackageName}
  */
-class ${2:ClassName}
+
+/**
+ * ${3:Description}
+ *
+ * @package ${2:PackageName}
+ */
+class ${1:ClassName}
 {
     /**
      * Constructor

@@ -1,5 +1,8 @@
 <snippet>
-    <content><![CDATA[${1:public }function ${2:FunctionName}($3)
+    <content><![CDATA[/**
+ * $4
+ */
+${3:public }function ${1:FunctionName}($2)
 {
     $0
 }]]></content>

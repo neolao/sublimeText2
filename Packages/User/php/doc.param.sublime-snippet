@@ -1,0 +1,5 @@
+<snippet>
+    <content><![CDATA[@param    ${1:string}     ${2:variable}       ${3:Description}]]></content>
+    <tabTrigger>@param</tabTrigger>
+    <scope>source.php</scope>
+</snippet>
