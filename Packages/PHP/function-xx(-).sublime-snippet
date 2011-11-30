@@ -1,7 +1,7 @@
 <snippet>
-    <content><![CDATA[${1:public }function ${2:FunctionName}(${3:\$${4:value}${5:=''}})
+    <content><![CDATA[${1:public }function ${2:FunctionName}($3)
 {
-	${0:# code...}
+    $0
 }]]></content>
     <tabTrigger>fun</tabTrigger>
     <scope>source.php</scope>
