@@ -1,5 +1,5 @@
 <snippet>
-    <content><![CDATA[@param    ${1:string}     ${2:variable}       ${3:Description}]]></content>
+    <content><![CDATA[@param   ${1:string}      ${2:variable}    ${0:Description}]]></content>
     <tabTrigger>@param</tabTrigger>
     <scope>source.php</scope>
 </snippet>

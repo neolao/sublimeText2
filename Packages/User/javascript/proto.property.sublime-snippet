@@ -1,0 +1,12 @@
+<snippet>
+    <content><![CDATA[/**
+ * $4
+ * 
+ * @type    ${3:String}
+ */
+proto.${1:variable} = ${2:null};
+]]></content>
+    <tabTrigger>proto</tabTrigger>
+    <scope>source.js</scope>
+    <description>Create a property</description>
+</snippet>

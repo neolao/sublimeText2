@@ -130,7 +130,9 @@ class SideBarItem:
 			import subprocess
 			subprocess.Popen([self.nameSystem()], cwd=self.dirnameSystem(), shell=True)
 		else:
-			sys.path.append(os.path.join(sublime.packages_path(), 'SideBarEnhancements'))
+			path = os.path.join(sublime.packages_path(), 'SideBarEnhancements')
+			if path not in sys.path:
+				sys.path.append(path)
 			import desktop
 			desktop.open(self.path())
 
@@ -217,7 +219,7 @@ class SideBarItem:
 
 		options = Object()
 
-		options.scroll = [view.rowcol(view.visible_region().begin()), view.rowcol(view.visible_region().end())]
+		options.scroll = view.viewport_position()
 
 		options.selections = []
 		for sel in view.sel():
@@ -287,7 +289,7 @@ class SideBarItem:
 			if len(rs):
 				view.add_regions("bookmarks", rs, "bookmarks", "bookmark", sublime.HIDDEN | sublime.PERSISTENT)
 
-			view.show(view.text_point(options.scroll[1][0], options.scroll[1][1]), False)
+			view.set_viewport_position(options.scroll, False)
 
 	def copy(self, location):
 		location = SideBarItem(location, os.path.isdir(location));

@@ -1,0 +1,5 @@
+<snippet>
+    <content><![CDATA[@param   ${1:String}      ${2:variable}    ${0:Description}]]></content>
+    <tabTrigger>@param</tabTrigger>
+    <scope>source.js</scope>
+</snippet>

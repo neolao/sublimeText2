@@ -1,0 +1,13 @@
+<snippet>
+    <content><![CDATA[/**
+ * $3
+ */
+proto.${1:methodName} = function($2)
+{
+	$0
+};
+]]></content>
+    <tabTrigger>proto</tabTrigger>
+    <scope>source.js</scope>
+    <description>Create a method</description>
+</snippet>

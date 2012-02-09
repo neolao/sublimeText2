@@ -1,3 +1,16 @@
 {
-	"auto_upgrade_last_run": 1322557858
+	"auto_upgrade_last_run": 1327307359,
+	"installed_packages":
+	[
+		"Alignment",
+		"Clipboard History",
+		"CTags",
+		"Git",
+		"Indent Guides",
+		"Indent XML",
+		"Package Control",
+		"SideBarEnhancements",
+		"SideBarGit",
+		"ZenCoding"
+	]
 }
