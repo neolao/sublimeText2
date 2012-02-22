@@ -14,6 +14,10 @@
         // "css_properties"
     ],
 
+    // Report some usage statistics
+    // (currently just platform/arch/version/bool(unicode in packages path) etc)
+    "zenarbitrage" : true,
+
     // For those who just want `zen as you type`, disable completions entirely
     "disable_completions": false,
 
@@ -24,11 +28,11 @@
     // You don't copy the whole structure, but rather individual keys.
     // Inside the `File Settings` key.
     //                      |
-    //                     /^\ 
+    //                     /^\
     "File Settings" :       {
         //     README------^/
         //     README----->/
-        //     README----^/ 
+        //     README----^/
         //>------------->/
 
         // If `true` will disable ctrl+alt+n binding

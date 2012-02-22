@@ -861,7 +861,7 @@ def increment_number(editor, step):
             num = content[r[0]:r[1]]
             num = zencoding.utils.prettify_number(float(num) + float(step))
             # mark result as selection
-            editor.replace_content('${0:%s}' % num, r[0], r[1]);
+            editor.replace_content('${0:%s}' % num, r[0], r[1], escape=False);
 #           editor.create_selection(r[0], r[0] + len(num))
             return True
         except:

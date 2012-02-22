@@ -202,7 +202,7 @@ class SideBarFindInSelectedCommand(sublime_plugin.WindowCommand):
 		for item in SideBarSelection(paths).getSelectedItemsWithoutChildItems():
 			items.append(item.path())
 		self.window.run_command('hide_panel');
-		if sublime.version() >= 2134:
+		if int(sublime.version()) >= 2134:
 			self.window.run_command("show_panel", {"panel": "find_in_files", "where":",".join(items) })
 		else:
 			self.window.run_command("show_panel", {"panel": "find_in_files", "location":",".join(items) })
@@ -217,7 +217,7 @@ class SideBarFindInParentCommand(sublime_plugin.WindowCommand):
 			items.append(item.dirname())
 		items = uniqueList(items)
 		self.window.run_command('hide_panel');
-		if sublime.version() >= 2134:
+		if int(sublime.version()) >= 2134:
 			self.window.run_command("show_panel", {"panel": "find_in_files", "where":",".join(items) })
 		else:
 			self.window.run_command("show_panel", {"panel": "find_in_files", "location":",".join(items) })
@@ -228,9 +228,9 @@ class SideBarFindInParentCommand(sublime_plugin.WindowCommand):
 class SideBarFindInProjectFoldersCommand(sublime_plugin.WindowCommand):
 	def run(self):
 		self.window.run_command('hide_panel');
-		if sublime.version() >= 2136:
+		if int(sublime.version()) >= 2136:
 			self.window.run_command("show_panel", {"panel": "find_in_files", "where":"<open folders>"})
-		elif sublime.version() >= 2134:
+		elif int(sublime.version()) >= 2134:
 			self.window.run_command("show_panel", {"panel": "find_in_files", "where":""})
 		else:
 			self.window.run_command("show_panel", {"panel": "find_in_files", "location":"<open folders>"})
@@ -252,7 +252,7 @@ class SideBarFindInFilesWithExtensionCommand(sublime_plugin.WindowCommand):
 			items.append('*'+item.extension())
 		items = uniqueList(items)
 		self.window.run_command('hide_panel');
-		if sublime.version() >= 2134:
+		if int(sublime.version()) >= 2134:
 			self.window.run_command("show_panel", {"panel": "find_in_files", "where":",".join(items) })
 		else:
 			self.window.run_command("show_panel", {"panel": "find_in_files", "location":",".join(items) })
@@ -288,14 +288,14 @@ class SideBarFindFilesPathContainingCommand(sublime_plugin.WindowCommand):
 			self.find(item.path())
 			content += '\nSearching '+str(self.num_files)+' files for "'+self.searchTerm+'" in \n"'+item.path()+'"\n\n'
 			content += (':\n'.join(self.files))+':\n\n'
-			lenght = len(self.files)
-			if lenght > 1:
-				content += str(lenght)+' matches\n'
-			elif lenght > 0:
+			length = len(self.files)
+			if length > 1:
+				content += str(length)+' matches\n'
+			elif length > 0:
 				content += '1 match\n'
 			else:
 				content += 'No match\n'
-			self.total = self.total + lenght
+			self.total = self.total + length
 		if self.total > 0:
 			view = sublime.active_window().new_file()
 			view.settings().set('word_wrap', False)
@@ -346,10 +346,12 @@ class SideBarCutCommand(sublime_plugin.WindowCommand):
 
 class SideBarCopyCommand(sublime_plugin.WindowCommand):
 	def run(self, paths = []):
+
 		s = sublime.load_settings("SideBarEnhancements/Clipboard.sublime-settings")
 		items = []
 		for item in SideBarSelection(paths).getSelectedItemsWithoutChildItems():
 			items.append(item.path())
+
 		s.set('cut', '')
 		s.set('copy', "\n".join(items))
 		if len(items) > 1 :
@@ -361,11 +363,14 @@ class SideBarCopyCommand(sublime_plugin.WindowCommand):
 		return len(paths) > 0
 
 class SideBarPasteCommand(sublime_plugin.WindowCommand):
-	def run(self, paths = [], in_parent = 'False'):
+	def run(self, paths = [], in_parent = 'False', test = 'True', replace = 'False'):
 		s = sublime.load_settings("SideBarEnhancements/Clipboard.sublime-settings")
 
 		cut = s.get('cut', '')
 		copy = s.get('copy', '')
+
+		already_exists_paths = []
+
 		if SideBarSelection(paths).len() > 0:
 			if in_parent == 'False':
 				location = SideBarSelection(paths).getSelectedItems()[0].path()
@@ -382,33 +387,75 @@ class SideBarPasteCommand(sublime_plugin.WindowCommand):
 				for path in cut:
 					path = SideBarItem(path, os.path.isdir(path))
 					new  = os.path.join(location.path(), path.name())
-					try:
-						if not path.move(new):
-							sublime.error_message("Unable to cut and paste, destination exists.")
-							return
-					except:
-						sublime.error_message("Unable to move:\n\n"+path.path()+"\n\nto\n\n"+new)
-						return
+					if test == 'True' and os.path.exists(new):
+						already_exists_paths.append(new)
+					elif test == 'False':
+						if os.path.exists(new) and replace == 'False':
+							pass
+						else:
+							try:
+								if not path.move(new, replace == 'True'):
+									sublime.error_message("Unable to cut and paste, destination exists.")
+									return
+							except:
+								sublime.error_message("Unable to move:\n\n"+path.path()+"\n\nto\n\n"+new)
+								return
 
 			if copy != '':
 				copy = copy.split("\n")
 				for path in copy:
 					path = SideBarItem(path, os.path.isdir(path))
 					new  = os.path.join(location.path(), path.name())
-					try:
-						if not path.copy(new):
-							sublime.error_message("Unable to copy and paste, destination exists.")
-							return
-					except:
-						sublime.error_message("Unable to copy:\n\n"+path.path()+"\n\nto\n\n"+new)
-						return
+					if test == 'True' and os.path.exists(new):
+						already_exists_paths.append(new)
+					elif test == 'False':
+						if os.path.exists(new) and replace == 'False':
+							pass
+						else:
+							try:
+								if not path.copy(new, replace == 'True'):
+									sublime.error_message("Unable to copy and paste, destination exists.")
+									return
+							except:
+								sublime.error_message("Unable to copy:\n\n"+path.path()+"\n\nto\n\n"+new)
+								return
 
-			cut = s.set('cut', '')
-			SideBarProject().refresh();
+			if test == 'True' and len(already_exists_paths):
+				self.confirm(paths, in_parent, already_exists_paths)
+			elif test == 'True' and not len(already_exists_paths):
+				self.run(paths, in_parent, 'False', 'False')
+			elif test == 'False':
+				cut = s.set('cut', '')
+				SideBarProject().refresh();
+
+	def confirm(self, paths, in_parent, data):
+		import functools
+		window = sublime.active_window()
+		window.show_input_panel("BUG!", '', '', None, None)
+		window.run_command('hide_panel');
+
+		yes = []
+		yes.append('Yes, Replace the following items:');
+		for item in data:
+			yes.append(SideBarItem(item, os.path.isdir(item)).pathWithoutProject())
+
+		no = []
+		no.append('No');
+		no.append('Continue copying without replacing');
+
+		window.show_quick_panel([yes, no], functools.partial(self.on_done, paths, in_parent))
+
+	def on_done(self, paths, in_parent, result):
+		if result != -1:
+			if result == 0:
+				self.run(paths, in_parent, 'False', 'True')
+			else:
+				self.run(paths, in_parent, 'False', 'False')
 
 	def is_enabled(self, paths = [], in_parent = False):
 		s = sublime.load_settings("SideBarEnhancements/Clipboard.sublime-settings")
 		return s.get('cut', '') + s.get('copy', '') != '' and len(SideBarSelection(paths).getSelectedDirectoriesOrDirnames()) == 1
+
 
 class SideBarCopyNameCommand(sublime_plugin.WindowCommand):
 	def run(self, paths = []):
@@ -806,22 +853,46 @@ class SideBarMoveCommand(sublime_plugin.WindowCommand):
 		return len(paths) == 1 and SideBarSelection(paths).hasProjectDirectories() == False
 
 class SideBarDeleteCommand(sublime_plugin.WindowCommand):
-	def run(self, paths = []):
-		import sys
-		try:
-			path = os.path.join(sublime.packages_path(), 'SideBarEnhancements')
-			if path not in sys.path:
-				sys.path.append(path)
-			import send2trash
-			for item in SideBarSelection(paths).getSelectedItemsWithoutChildItems():
-				if s.get('close_affected_buffers_when_deleting_even_if_dirty', False):
-					self.close_affected_buffers(item.path())
-				send2trash.send2trash(item.path())
-			SideBarProject().refresh();
-		except:
-			import functools
-			self.window.run_command('hide_panel');
-			self.window.show_input_panel("Permanently Delete:", paths[0], functools.partial(self.on_done, paths[0]), None, None)
+	def run(self, paths = [], confirmed = 'False'):
+		if confirmed == 'False' and s.get('confirm_before_deleting', True):
+			self.confirm(paths)
+		else:
+			import sys
+			try:
+				path = os.path.join(sublime.packages_path(), 'SideBarEnhancements')
+				if path not in sys.path:
+					sys.path.append(path)
+				import send2trash
+				for item in SideBarSelection(paths).getSelectedItemsWithoutChildItems():
+					if s.get('close_affected_buffers_when_deleting_even_if_dirty', False):
+						self.close_affected_buffers(item.path())
+					send2trash.send2trash(item.path())
+				SideBarProject().refresh();
+			except:
+				import functools
+				self.window.run_command('hide_panel');
+				self.window.show_input_panel("Permanently Delete:", paths[0], functools.partial(self.on_done, paths[0]), None, None)
+
+	def confirm(self, paths):
+		import functools
+		window = sublime.active_window()
+		window.show_input_panel("BUG!", '', '', None, None)
+		window.run_command('hide_panel');
+
+		yes = []
+		yes.append('Yes');
+		yes.append('Delete the selected items.');
+
+		no = []
+		no.append('No');
+		no.append('Cancel the operation.');
+
+		window.show_quick_panel([yes, no], functools.partial(self.on_confirm, paths))
+
+	def on_confirm(self, paths, result):
+		if result != -1:
+			if result == 0:
+				self.run(paths, 'True')
 
 	def on_done(self, old, new):
 		if s.get('close_affected_buffers_when_deleting_even_if_dirty', False):

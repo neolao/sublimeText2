@@ -26,7 +26,7 @@ def active_view():
 ################################################################################
 
 class ZenEditor():
-    def expand_abbr(self, abbr, syntax = None, selection=True, 
+    def expand_abbr(self, abbr, syntax = None, selection=True,
                                                super_profile=None):
 
         syntax       = syntax or self.get_syntax()
@@ -74,7 +74,7 @@ class ZenEditor():
         zen_editor.create_selection(15)
         """
 
-        
+
         view = active_view()
         view.sel().clear()
 
@@ -119,7 +119,8 @@ class ZenEditor():
         view = active_view()
         return view.substr(view.line(view.sel()[0]))
 
-    def replace_content(self, value, start=None, end=None, zero_stops=False):
+    def replace_content(self, value, start=None, end=None, zero_stops=False, 
+                              escape = True):
         """
         Replace editor's content or it's part (from *start* to
         *end* index). If *value* contains
@@ -150,8 +151,14 @@ class ZenEditor():
 
         self.create_selection(start, end)
 
-        value = value.replace('$', r'\$')
-        value = self.add_placeholders(value, selection=0, explicit_zero=zero_stops)
+        # print value
+        if escape:
+            value = value.replace('$', r'\$')
+
+        value = self.add_placeholders(value,
+            selection     = 0, 
+            explicit_zero = zero_stops
+        )
 
         if '\n' in value:
             for sel in view.sel():
@@ -184,7 +191,8 @@ class ZenEditor():
             if 'xsl' in scope:
                 doc_type = 'xsl'
             else:
-                doc_type = re.findall(r'\bhtml|js|css|xml|haml\b', scope)[0]
+                doc_type = re.findall(r'\bhtml|js|css|xml|haml|stylus\b', scope)[0]
+                # if doc_type == 'stylus': doc_type = 'css'
                 # Sublime has back to front scopes ....
         except:
             doc_type = default_type

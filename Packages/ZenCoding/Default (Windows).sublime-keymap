@@ -215,7 +215,7 @@
   },
 {
     "keys": [
-      "ctrl+alt+n"
+      "ctrl+alt+m"
     ],
     "__doc__": "Moves caret to matching opening or closing tag\n",
     "args": {
@@ -417,7 +417,7 @@
 },
 {
   "keys": [
-    "ctrl+alt+shift+v"
+    "ctrl+alt+shift+f10"
   ],
   "__doc__": "Reflect CSS value: takes rule's value under caret and pastes it for the same \nrules with vendor prefixes\n@param editor: ZenEditor",
   "args": {
@@ -676,18 +676,5 @@
       "match_all": true,
       "key": "following_text"
     }]
-  },
-  {
-      "keys"    : ["tab"],
-      "__doc__" : "Insert a completion when there is a snippet active as long as there's a valid abbrevation that doesn't end in a full stop.",
-      "command" : "insert_best_completion",
-      "args"    : {"exact" : false, "default": "\t"},
-      "context": [
-          { "key": "is_zen",                 "operator": "equal",              "operand": true },
-          { "key": "preceding_text",         "operator": "not_regex_contains", "operand": "\\.$",      "match_all": true },
-          { "key": "has_next_field",         "operator": "equal",              "operand": true },
-          { "key": "setting.tab_completion", "operator": "equal",              "operand": true },
-          { "key": "selector",               "operator": "equal",              "operand": "text.html", "match_all": true}
-      ]
-    }
-  ]
+  }
+]

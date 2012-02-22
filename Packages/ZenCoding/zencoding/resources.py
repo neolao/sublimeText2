@@ -98,7 +98,6 @@ def create_resource_chain(vocabulary, syntax, name):
 		if name in resource:
 			result.append(resource[name])
 
-
 	# get inheritance definition
 	# in case of user-defined vocabulary, resource dependency
 	# may be defined in system vocabulary only, so we have to correctly

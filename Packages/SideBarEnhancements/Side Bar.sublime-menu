@@ -1,4 +1,5 @@
 [
+	{"caption":"-", "id":"side-bar-start-separator"},
 	{ "caption": "New File…", 	      "id": "side-bar-new-file",         "command": "side_bar_new_file",         "args": {"paths": []} },
 	{ "caption": "New Folder…",       "id": "side-bar-new-directory",       "command": "side_bar_new_directory",       "args": {"paths": []} },
 	{ "caption": "-",                 "id": "side-bar-new-separator"},
@@ -38,6 +39,7 @@
 	{ "caption": "Cut",               "id": "side-bar-clip-cut",         "command": "side_bar_cut",              "args": {"paths": []} },
 	{ "caption": "Copy",              "id": "side-bar-clip-copy",        "command": "side_bar_copy",             "args": {"paths": []} },
 	{ "caption": "Copy Name",         "id": "side-bar-clip-copy-name",                     "command": "side_bar_copy_name",                         "args": {"paths": []} },
+	{ "caption": "Copy Path",         "id": "side-bar-clip-copy-path",    "command": "side_bar_copy_path_absolute_from_project_encoded",        "args": {"paths": []} },
 	{ "caption": "Copy as Text",      "id": "side-bar-clip-copy-as",
 		"children":
 		[
@@ -86,6 +88,7 @@
 	{ "caption": "-",                 "id": "side-bar-delete-separator" },
 
   { "caption": "Refresh",           "id": "side-bar-refresh",          "command": "refresh_folder_list" },
+	{ "caption": "-",                 "id": "side-bar-refresh-separator" },
 	{ "caption": "Project",      			"id": "side-bar-project",
 		"children":
 		[
