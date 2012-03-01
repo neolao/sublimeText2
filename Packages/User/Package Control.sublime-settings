@@ -5,12 +5,15 @@
 		"Alignment",
 		"Clipboard History",
 		"CTags",
+		"Function Name Display",
 		"Git",
 		"Indent Guides",
 		"Indent XML",
+		"Logs Colorize",
 		"Package Control",
 		"SideBarEnhancements",
 		"SideBarGit",
+		"SublimeTODO",
 		"ZenCoding"
 	]
 }
