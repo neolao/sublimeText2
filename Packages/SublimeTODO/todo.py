@@ -29,8 +29,8 @@ DEFAULT_SETTINGS = {
     'core_patterns': {
         'TODO': r'TODO[\s]*?:+(?P<todo>.*)$',
         'NOTE': r'NOTE[\s]*?:+(?P<note>.*)$',
-        'FIXME': r'FIX ?ME[\s]*?:+(?P<fixme>\S.*)$',
-        'CHANGED': r'CHANGED[\s]*?:+(?P<changed>\S.*)$'
+        'FIXME': r'FIX ?ME[\s]*?:+(?P<fixme>.*)$',
+        'CHANGED': r'CHANGED[\s]*?:+(?P<changed>.*)$'
     },
 
     'patterns': {}
@@ -164,7 +164,8 @@ class TodoExtractor(object):
     def extract(self):
         """"""
         message_patterns = '|'.join(self.patterns.values())
-        patt = re.compile(message_patterns, re.IGNORECASE)
+        case_sensitivity = 0 if self.settings.get('case_sensitive', False) else re.IGNORECASE
+        patt = re.compile(message_patterns, case_sensitivity)
         for filepath in self.search_targets():
             try:
                 f = open(filepath)
@@ -198,7 +199,7 @@ class TodoRenderer(object):
     def header(self):
         hr = u'+ {0} +'.format('-' * 76)
         return u'{hr}\n| TODOS @ {0:<68} |\n| {1:<76} |\n{hr}\n'.format(
-            datetime.utcnow().strftime('%A %d %B %Y %H:%M'),
+            datetime.utcnow().strftime('%A %d %B %Y %H:%M').decode("utf-8"),
             u'{0} files scanned'.format(self.file_counter),
             hr=hr)
 
