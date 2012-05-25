@@ -3,6 +3,8 @@
 A Sublime Text 2 plugin to extract and list TODO comments from open files and 
 project folders.
 
+Take a look at [this screencast](http://webdesign.tutsplus.com/tutorials/applications/quick-tip-streamline-your-todo-lists-in-sublime-text-2/) (courtesy of Shannon Huffman) for an overview.
+
 
 # Install
 
@@ -28,6 +30,7 @@ All plugin configuration must be placed in user or project-specific settings ins
 
 See an example user settings file [here](https://gist.github.com/2049887).
 
+
 ## Adding comment patterns
 
 Extraction uses regular expressions that return one match group 
@@ -51,6 +54,7 @@ By default, searching is case insensitive. You can change this behaviour by addi
     "case_insensitive": true
 
 to the todo settings object.
+
 
 ## Excluding files and folders
 
@@ -86,8 +90,9 @@ Override the results view title by setting `result_title`
 
 # Usage
 
-`Show TODOs` command can be triggered from the command palette. No default 
-key bindings are provided.
+`Show TODOs: Project and open files` scans all files in your project
+`Show TODOs: Open files only` scans only open, saved files
+Both are triggered from the command palette. No default key bindings are provided.
 
 ## Navigating results
 
