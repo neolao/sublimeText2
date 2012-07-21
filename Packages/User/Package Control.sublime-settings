@@ -1,8 +1,10 @@
 {
-	"auto_upgrade_last_run": 1338449670,
+	"auto_upgrade_last_run": 1342443736,
 	"installed_packages":
 	[
+		"ActionScript 3",
 		"Alignment",
+		"All Autocomplete",
 		"Clipboard History",
 		"Function Name Display",
 		"Git",
@@ -10,8 +12,10 @@
 		"Indent XML",
 		"Logs Colorize",
 		"Package Control",
+		"SCSS",
 		"SideBarEnhancements",
 		"SideBarGit",
+		"SublimeLinter",
 		"SublimeTODO",
 		"ZenCoding"
 	]
