@@ -302,3 +302,46 @@ CHANGES/FIXES
 - Linter arguments are now consistently defined as arrays (instead of tuples).
 
 - Syntax map settings are no longer (sometimes) case-sensitive.
+
+
+SublimeLinter 1.6.6 changelog
+=============================
+
+CHANGES/FIXES
+
+- JSHint now shows underlines at the appropriate character positions when
+  using tabs for indentation.
+
+- Upgrading CSSLint to the latest version (v0.9.8). This adds support for the
+  latest "Compatibility" options: "Disallow star hack" and "Disallow
+  underscore hack".
+
+- Annotation highlighting is working again.
+
+- Git Commit Message linting now ignores `git --diff` output in messages.
+  These lines are automatically generated and inserted when running
+  `git commit -v`.
+
+
+SublimeLinter 1.6.7 changelog
+=============================
+
+NEW FEATURES
+
+- Puppet linting is now supported via `puppet parser validate`.
+
+- Added an option for more granular control of outline decorations. Set the
+  value of "sublimelinter_mark_style" to "outline", "fill", or "none" in
+  the user settings.
+
+
+CHANGES/FIXES
+
+- Repaired the built-in CSS linter (CSSLint). This was broken with with the
+  last update.
+
+- Added missing documentation for "save-only" linting in the settings file.
+
+- Adjusted ambiguous/misleading documentation for the
+  "sublimelinter_executable_map" setting.
+

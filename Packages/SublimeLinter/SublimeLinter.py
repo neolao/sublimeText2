@@ -44,29 +44,30 @@ MARKS = {
 # All available settings for SublimeLinter;
 # only these are inherited from SublimeLinter.sublime-settings
 ALL_SETTINGS = [
-    'sublimelinter',
-    'sublimelinter_executable_map',
-    'sublimelinter_syntax_map',
-    'sublimelinter_disable',
-    'sublimelinter_delay',
-    'sublimelinter_fill_outlines',
-    'sublimelinter_gutter_marks',
-    'sublimelinter_wrap_find',
-    'sublimelinter_popup_errors_on_save',
-    'perl_linter',
+    'annotations',
+    'csslint_options',
+    'gjslint_ignore',
+    'gjslint_options',
     'javascript_linter',
     'jshint_options',
     'jslint_options',
-    'gjslint_options',
-    'gjslint_ignore',
-    'csslint_options',
     'pep8',
     'pep8_ignore',
+    'perl_linter',
     'pyflakes_ignore',
     'pyflakes_ignore_import_*',
-    'sublimelinter_objj_check_ascii',
+    'sublimelinter',
+    'sublimelinter_delay',
+    'sublimelinter_disable',
+    'sublimelinter_executable_map',
+    'sublimelinter_fill_outlines',
+    'sublimelinter_gutter_marks',
+    'sublimelinter_mark_style',
     'sublimelinter_notes',
-    'annotations'
+    'sublimelinter_objj_check_ascii',
+    'sublimelinter_popup_errors_on_save',
+    'sublimelinter_syntax_map',
+    'sublimelinter_wrap_find',
 ]
 
 WHITESPACE_RE = re.compile(r'\s+')
@@ -121,9 +122,6 @@ def update_statusbar(view):
 
 def run_once(linter, view, **kwargs):
     '''run a linter on a given view regardless of user setting'''
-    if view.settings().get('sublimelinter_notes'):
-        highlight_notes(view)
-
     if not linter:
         return
 
@@ -140,6 +138,10 @@ def run_once(linter, view, **kwargs):
     UNDERLINES[vid].extend(warning_underlines)
 
     add_lint_marks(view, lines, error_underlines, violation_underlines, warning_underlines)
+
+    if view.settings().get('sublimelinter_notes'):
+        highlight_notes(view)
+
     update_statusbar(view)
     end = time.time()
     TIMES[vid] = (end - start) * 1000  # Keep how long it took to lint
@@ -210,7 +212,13 @@ def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_
             view.add_regions('lint-underline-' + type_name, underlines, 'sublimelinter.underline.' + type_name, sublime.DRAW_EMPTY_AS_OVERWRITE)
 
     if lines:
-        fill_outlines = view.settings().get('sublimelinter_fill_outlines', False)
+        outline_style = view.settings().get('sublimelinter_mark_style', 'outline')
+
+        # This test is for the legacy "fill" setting; it will be removed
+        # in a future version (likely v1.7).
+        if view.settings().get('sublimelinter_fill_outlines', False):
+            outline_style = 'fill'
+
         gutter_mark_enabled = True if view.settings().get('sublimelinter_gutter_marks', False) else False
 
         outlines = {'warning': [], 'violation': [], 'illegal': []}
@@ -232,7 +240,12 @@ def add_lint_marks(view, lines, error_underlines, violation_underlines, warning_
                     'sublimelinter.outline.{0}'.format(lint_type),
                     MARKS[lint_type][gutter_mark_enabled]
                 ]
-                if not fill_outlines:
+
+                if outline_style == 'none':
+                    args.append(sublime.HIDDEN)
+                elif outline_style == 'fill':
+                    pass  # outlines are filled by default
+                else:
                     args.append(sublime.DRAW_OUTLINED)
                 view.add_regions(*args)
 

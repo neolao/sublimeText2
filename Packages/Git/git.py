@@ -74,15 +74,15 @@ def do_when(conditional, callback, *args, **kwargs):
     sublime.set_timeout(functools.partial(do_when, conditional, callback, *args, **kwargs), 50)
 
 
-def _make_text_safeish(text, fallback_encoding):
+def _make_text_safeish(text, fallback_encoding, method='decode'):
     # The unicode decode here is because sublime converts to unicode inside
     # insert in such a way that unknown characters will cause errors, which is
     # distinctly non-ideal... and there's no way to tell what's coming out of
     # git in output. So...
     try:
-        unitext = text.decode('utf-8')
-    except UnicodeDecodeError:
-        unitext = text.decode(fallback_encoding)
+        unitext = getattr(text, method)('utf-8')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        unitext = getattr(text, method)(fallback_encoding)
     return unitext
 
 
@@ -173,7 +173,8 @@ class GitCommand(object):
                 do_when(lambda: not self.active_view().is_loading(), lambda: self.active_view().set_viewport_position(position, False))
                 # self.active_view().show(position)
 
-        if self.active_view().settings().get('live_git_annotations'):
+        view = self.active_view()
+        if view and view.settings().get('live_git_annotations'):
             self.view.run_command('git_annotate')
 
         if not result.strip():
@@ -223,6 +224,11 @@ class GitWindowCommand(GitCommand, sublime_plugin.WindowCommand):
         if view and view.file_name() and len(view.file_name()) > 0:
             return view.file_name()
 
+    @property
+    def fallback_encoding(self):
+        if self.active_view() and self.active_view().settings().get('fallback_encoding'):
+            return self.active_view().settings().get('fallback_encoding').rpartition('(')[2].rpartition(')')[0]
+
     # If there's no active view or the active view is not a file on the
     # filesystem (e.g. a search results view), we can infer the folder
     # that the user intends Git commands to run against when there's only
@@ -240,9 +246,12 @@ class GitWindowCommand(GitCommand, sublime_plugin.WindowCommand):
     def get_working_dir(self):
         file_name = self._active_file_name()
         if file_name:
-            return os.path.dirname(file_name)
+            return os.path.realpath(os.path.dirname(file_name))
         else:
-            return self.window.folders()[0]
+            try: # handle case with no open folder
+                return self.window.folders()[0]
+            except IndexError:
+                return ''
 
     def get_window(self):
         return self.window
@@ -262,7 +271,7 @@ class GitTextCommand(GitCommand, sublime_plugin.TextCommand):
         return os.path.basename(self.view.file_name())
 
     def get_working_dir(self):
-        return os.path.dirname(self.view.file_name())
+        return os.path.realpath(os.path.dirname(self.view.file_name()))
 
     def get_window(self):
         # Fun discovery: if you switch tabs while a command is working,
@@ -554,7 +563,7 @@ class GitCommitCommand(GitWindowCommand):
         # Okay, get the template!
         s = sublime.load_settings("Git.sublime-settings")
         if s.get("verbose_commits"):
-            self.run_command(['git', 'diff', '--staged'], self.diff_done)
+            self.run_command(['git', 'diff', '--staged', '--no-color'], self.diff_done)
         else:
             self.run_command(['git', 'status'], self.diff_done)
 
@@ -597,7 +606,7 @@ class GitCommitCommand(GitWindowCommand):
             history.insert(0, message)
         # write the temp file
         message_file = tempfile.NamedTemporaryFile(delete=False)
-        message_file.write(message)
+        message_file.write(_make_text_safeish(message, self.fallback_encoding, 'encode'))
         message_file.close()
         self.message_file = message_file
         # and actually commit
@@ -703,6 +712,8 @@ class GitAddChoiceCommand(GitStatusCommand):
             sublime.MONOSPACE_FONT)
 
     def panel_followup(self, picked_status, picked_file, picked_index):
+        working_dir=git_root(self.get_working_dir())
+
         if picked_index == 0:
             command = ['git', 'add', '--update']
         elif picked_index == 1:
@@ -710,14 +721,14 @@ class GitAddChoiceCommand(GitStatusCommand):
         else:
             command = ['git']
             picked_file = picked_file.strip('"')
-            if os.path.isfile(picked_file):
+            if os.path.isfile(working_dir+"/"+picked_file):
                 command += ['add']
             else:
                 command += ['rm']
             command += ['--', picked_file]
 
         self.run_command(command, self.rerun,
-            working_dir=git_root(self.get_working_dir()))
+            working_dir=working_dir)
 
     def rerun(self, result):
         self.run()
@@ -839,8 +850,13 @@ class GitBranchCommand(GitWindowCommand):
         if picked_branch.startswith("*"):
             return
         picked_branch = picked_branch.strip()
-        self.run_command(['git'] + self.command_to_run_after_branch + [picked_branch])
+        self.run_command(['git'] + self.command_to_run_after_branch + [picked_branch], self.update_status)
 
+    def update_status(self, result):
+        global branch
+        branch = ""
+        for view in self.window.views():
+            view.run_command("git_branch_status")
 
 class GitMergeCommand(GitBranchCommand):
     command_to_run_after_branch = ['merge']
@@ -859,6 +875,36 @@ class GitNewBranchCommand(GitWindowCommand):
             self.panel("No branch name provided")
             return
         self.run_command(['git', 'checkout', '-b', branchname])
+
+
+class GitNewTagCommand(GitWindowCommand):
+    def run(self):
+        self.get_window().show_input_panel("Tag name", "", self.on_input, None, None)
+
+    def on_input(self, tagname):
+        if not tagname.strip():
+            self.panel("No branch name provided")
+            return
+        self.run_command(['git', 'tag', tagname])
+
+class GitShowTagsCommand(GitWindowCommand):
+    def run(self):
+        self.run_command(['git', 'tag'], self.fetch_tag)
+
+    def fetch_tag(self, result):
+        self.results = result.rstrip().split('\n')
+        self.quick_panel(self.results, self.panel_done)
+
+    def panel_done(self, picked):
+        if 0 > picked < len(self.results):
+            return
+        picked_tag = self.results[picked]
+        picked_tag = picked_tag.strip()
+        self.run_command(['git', 'show', picked_tag])
+
+class GitPushTagsCommand(GitWindowCommand):
+    def run(self):
+        self.run_command(['git', 'push', '--tags'])
 
 
 class GitCheckoutCommand(GitTextCommand):
@@ -1087,7 +1133,7 @@ class GitAnnotateCommand(GitTextCommand):
 
     def compare_tmp(self, result, stdout=None):
         all_text = self.view.substr(sublime.Region(0, self.view.size())).encode("utf-8")
-        self.run_command(['diff', '-u', self.tmp.name, '-'], stdin=all_text, no_save=True, show_status=False, callback=self.parse_diff)
+        self.run_command(['diff', '--no-color', '-u', self.tmp.name, '-'], stdin=all_text, no_save=True, show_status=False, callback=self.parse_diff)
 
     # This is where the magic happens. At the moment, only one chunk format is supported. While
     # the unified diff format theoritaclly supports more, I don't think git diff creates them.
@@ -1222,3 +1268,25 @@ class GitGitkCommand(GitTextCommand):
     def run(self, edit):
         command = ['gitk']
         self.run_command(command)
+
+class GitBranchStatusListener(sublime_plugin.EventListener):
+    def on_load(self, view):
+        view.run_command("git_branch_status")
+
+branch = ""
+class GitBranchStatusCommand(GitTextCommand):
+    def run(self, view):
+        global branch
+
+        if branch:
+            self.set_status(branch)
+        else:
+            self.run_command(['git','rev-parse','--abbrev-ref','HEAD'], self.branch_done, show_status=False)
+
+    def branch_done(self, result):
+        global branch
+        branch = result.strip()
+        self.set_status(branch)
+
+    def set_status(self, branch):
+        self.view.set_status("git-branch", "git branch: " + branch)

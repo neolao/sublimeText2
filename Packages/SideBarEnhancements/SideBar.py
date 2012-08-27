@@ -1009,7 +1009,11 @@ class SideBarDeleteCommand(sublime_plugin.WindowCommand):
 	def run(self, paths = [], confirmed = 'False'):
 
 		if confirmed == 'False' and s.get('confirm_before_deleting', True):
-			self.confirm([item.path() for item in SideBarSelection(paths).getSelectedItems()], [item.pathWithoutProject() for item in SideBarSelection(paths).getSelectedItems()])
+			if sublime.platform() == 'osx':
+				if sublime.ok_cancel_dialog('delete the selected items?'):
+					self.run(paths, 'True')
+			else:
+				self.confirm([item.path() for item in SideBarSelection(paths).getSelectedItems()], [item.pathWithoutProject() for item in SideBarSelection(paths).getSelectedItems()])
 		else:
 			try:
 				for item in SideBarSelection(paths).getSelectedItemsWithoutChildItems():
@@ -1019,14 +1023,15 @@ class SideBarDeleteCommand(sublime_plugin.WindowCommand):
 				SideBarProject().refresh();
 			except:
 				import functools
+				self.window.show_input_panel("BUG!", '', '', None, None)
 				self.window.run_command('hide_panel');
 				self.window.show_input_panel("Permanently Delete:", SideBarSelection(paths).getSelectedItems()[0].path(), functools.partial(self.on_done, SideBarSelection(paths).getSelectedItems()[0].path()), None, None)
 
 	def confirm(self, paths, display_paths):
 		import functools
 		window = sublime.active_window()
-		# window.show_input_panel("BUG!", '', '', None, None)
-		# window.run_command('hide_panel');
+		window.show_input_panel("BUG!", '', '', None, None)
+		window.run_command('hide_panel');
 
 		yes = []
 		yes.append('Yes, delete the selected items.');
@@ -1036,7 +1041,7 @@ class SideBarDeleteCommand(sublime_plugin.WindowCommand):
 		no = []
 		no.append('No');
 		no.append('Cancel the operation.');
-		window.show_quick_panel([yes, no], functools.partial(self.on_confirm, paths))
+		sublime.set_timeout(lambda:window.show_quick_panel([yes, no], functools.partial(self.on_confirm, paths)), 200);
 
 	def on_confirm(self, paths, result):
 		if result != -1:
@@ -1180,3 +1185,10 @@ class SideBarOpenInNewWindowCommand(sublime_plugin.WindowCommand):
 
 	def is_visible(self, paths =[]):
 		return not s.get('disabled_menuitem_open_in_new_window')
+
+class SideBarProjectItemRemoveFolderCommand(sublime_plugin.WindowCommand):
+	def run(self, paths = []):
+		self.window.run_command('remove_folder', {"dirs":paths})
+
+	def is_enabled(self, paths =[]):
+		return SideBarSelection(paths).len() == 1 and SideBarSelection(paths).hasProjectDirectories() == True

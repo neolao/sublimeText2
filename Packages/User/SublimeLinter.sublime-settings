@@ -1,5 +1,5 @@
 {
-    "sublimelinter_fill_outlines": true,
+    "sublimelinter_fill_outlines": false,
     "sublimelinter_gutter_marks": true,
     "sublimelinter_popup_errors_on_save": false
 }
