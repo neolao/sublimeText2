@@ -5,7 +5,10 @@
 
     // Yeah, one day we'll merge these into the zen-coding.sublime-settings
 
-    // If `true` will disable bindings like ctrl+alt+n etc
+    // Set to `false` to disable all ZenCoding key bindings
+    "zen_keybinds"  : true,
+
+    // If `true` will disable only bindings like ctrl+alt+n etc
     // Handy for our italian friends :)
     "alt_gr"        : false,
 

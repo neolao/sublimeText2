@@ -1,331 +1,281 @@
-[{"args": {"doctype": "5"},
-  "command": "set_html_syntax_and_insert_skel",
-  "keys": ["ctrl+alt+shift+h"]},
- {"args": {},
-  "command": "zen_as_you_type",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "source.css - source.css.embedded, text.xml, text.html -source -meta.tag, meta.scope.between-tag-pair.html -source",
-               "operator": "equal"},
-              {"key": "setting.is_widget", "operand": false, "operator": "equal"}],
-  "keys": ["ctrl+alt+enter"]},
- {"command": "wrap_zen_as_you_type",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html meta.tag - string - meta.scope.between-tag-pair.html",
-               "operator": "equal"},
-              {"key": "setting.is_widget", "operand": false, "operator": "equal"}],
-  "keys": ["ctrl+alt+enter"]},
- {"command": "wrap_zen_as_you_type",
-  "context": [{"key": "selection_empty",
-               "match_all": true,
-               "operand": false,
-               "operator": "equal"},
-              {"key": "num_selections", "operand": 1, "operator": "equal"},
-              {"key": "setting.is_widget", "operand": false, "operator": "equal"}],
-  "keys": ["ctrl+alt+enter"]},
- {"args": {"action": "split_join_tag", "profile_name": null},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, text.xml",
-               "operator": "equal"},
-              {"key": "selection_empty",
-               "match_all": true,
-               "operand": true,
-               "operator": "equal"}],
-  "keys": ["shift+ctrl+j"]},
- {"args": {"action": "decrement_number_by_01"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "meta.property-list.css meta.property-value.css",
-               "operator": "equal"}],
-  "keys": ["ctrl+alt+9"]},
- {"args": {"action": "decrement_number_by_1"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "source.css meta.property-list.css meta.property-value.css",
-               "operator": "equal"}],
-  "keys": ["ctrl+9"]},
- {"args": {"action": "decrement_number_by_10"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "meta.property-list.css meta.property-value.css",
-               "operator": "equal"}],
-  "keys": ["ctrl+alt+shift+9"]},
- {"__doc__": "Encodes/decodes image under cursor to/from base64\n\n@since: 0.65",
-  "args": {"action": "encode_decode_base64"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, source.css, source.scss",
-               "operator": "equal"}],
-  "keys": ["ctrl+shift+alt+6"]},
- {"args": {},
-  "command": "zen_css_mnemonic",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "source.css, source.scss",
-               "operator": "equal"}],
-  "keys": ["f1"]},
- {"args": {"prop_value": true},
-  "command": "zen_css_mnemonic",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "meta.property-value.css",
-               "operator": "equal"}],
-  "keys": ["f1"]},
- {"__doc__": "Evaluates simple math expresison under caret\n@param editor: ZenEditor",
-  "args": {"action": "evaluate_math_expression"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, source.css, source.scss, text.xml",
-               "operator": "equal"},
-               {"key": "setting.alt_gr",
-                "operand": false,
-                "operator": "equal"}],
-  "keys": ["ctrl+alt+shift+="]},
- {"args": {"action": "match_pair_tagname"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, text.xml",
-               "operator": "equal"}],
-  "keys": ["ctrl+shift+a"]},
- {"__doc__": "Moves caret to matching opening or closing tag\n",
-  "args": {"action": "go_to_matching_pair"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, text.xml",
-               "operator": "equal"},
-              {"key": "setting.alt_gr",
-               "operand": false,
-               "operator": "equal"}],
-  "keys": ["ctrl+alt+n"]},
- {"args": {"action": "increment_number_by_01"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "meta.property-list.css meta.property-value.css",
-               "operator": "equal"}],
-  "keys": ["ctrl+alt+0"]},
- {"args": {"action": "increment_number_by_1"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "meta.property-list.css meta.property-value.css",
-               "operator": "equal"}],
-  "keys": ["ctrl+0"]},
- {"args": {"action": "increment_number_by_10"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, source.css, source.scss, text.xml",
-               "operator": "equal"}],
-  "keys": ["ctrl+alt+shift+0"]},
- {"__doc__": "Inserts newline character with proper indentation\n\n\n@param mode: Syntax mode (only 'html' is implemented)\n@type mode: str",
-  "args": {"action": "insert_formatted_newline", "mode": "html"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "meta.scope.between-tag-pair.html",
-               "operator": "equal"},
-              {"key": "setting.auto_match_enabled",
-               "operand": true,
-               "operator": "equal"},
-              {"key": "selection_empty",
-               "match_all": true,
-               "operand": true,
-               "operator": "equal"},
-              {"key": "following_text",
-               "match_all": true,
-               "operand": "^<$",
-               "operator": "not_regex_contains"},
-              {"key": "preceding_text",
-               "match_all": true,
-               "operand": ">$",
-               "operator": "regex_contains"}],
-  "keys": ["enter"]},
- {"__doc__": "Find and select HTML tag pair\n\n\n@param direction: Direction of pair matching: 'in' or 'out'. \n@type direction: str ",
-  "args": {"action": "match_pair", "direction": "out", "syntax": null},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, source.css, source.scss, text.xml",
-               "operator": "equal"}],
-  "keys": ["ctrl+shift+n"]},
- {"args": {"action": "match_pair_inward"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, text.xml",
-               "operator": "equal"}],
-  "keys": ["ctrl+shift+t"]},
- {"__doc__": "Merge lines spanned by user selection. If there's no selection, tries to find\nmatching tags and use them as selection\n",
-  "args": {"action": "merge_lines"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, text.xml",
-               "operator": "equal"}],
-  "keys": ["ctrl+j"]},
- {"__doc__": "Move caret to next edit point\n",
-  "args": {"action": "next_edit_point"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, source.css, text.xml",
-               "operator": "equal"}],
-  "keys": ["ctrl+period"]},
- {"__doc__": "Move caret to previous edit point\n",
-  "args": {"action": "prev_edit_point"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, source.css, text.xml",
-               "operator": "equal"}],
-  "keys": ["ctrl+,"]},
- {"__doc__": "Reflect CSS value: takes rule's value under caret and pastes it for the same \nrules with vendor prefixes\n@param editor: ZenEditor",
-  "args": {"action": "reflect_css_value"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "source.css",
-               "operator": "equal"}],
-  "keys": ["ctrl+alt+shift+v"]},
- {"__doc__": "Gracefully removes tag under cursor",
-  "args": {"action": "remove_tag"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, text.xml",
-               "operator": "equal"}],
-  "keys": ["ctrl+shift+u"]},
- // {"args": {"action": "select_next_item"},
- //  "command": "run_zen_action",
- //  "context": [{"key": "selector",
- //               "match_all": true,
- //               "operand": "text.html, source.css, text.xml",
- //               "operator": "equal"}],
- //  "keys": ["ctrl+alt+period"]},
- // {"args": {"action": "select_previous_item"},
- //  "command": "run_zen_action",
- //  "context": [{"key": "selector",
- //               "match_all": true,
- //               "operand": "text.html, source.css, text.xml",
- //               "operator": "equal"}],
- //  "keys": ["ctrl+alt+,"]},
- {"__doc__": "Splits or joins tag, e.g. transforms it into a short notation and vice versa:\n<div></div> \u2192 <div /> : join\n<div /> \u2192 <div></div> : split\n\n\n@param profile_name: Profile name\n@type profile_name: str",
-  "args": {"action": "split_join_tag", "profile_name": null},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, text.xml",
-               "operator": "equal"}],
-  "keys": ["ctrl+shift+j"]},
- {"__doc__": "Toggle comment on current editor's selection or HTML tag/CSS rule",
-  "args": {"action": "toggle_comment"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, source.css, text.xml",
-               "operator": "equal"}],
-  "keys": ["ctrl+alt+/"]},
- {"__doc__": "Update image size: reads image from image/CSS rule under caret\nand updates dimensions inside tag/rule",
-  "args": {"action": "update_image_size"},
-  "command": "run_zen_action",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, source.css, source.scss",
-               "operator": "equal"}],
-  "keys": ["ctrl+alt+shift+m"]},
- {"__doc__": "Wraps content with abbreviation\n\n\n@param syntax: Syntax type (html, css, etc.)\n@type syntax: str\n@param profile_name: Output profile name (html, xml, xhtml)\n@type profile_name: str",
-  "command": "wrap_zen_as_you_type",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html, text.xml",
-               "operator": "equal"}],
-  "keys": ["alt+shift+w"]},
- {"args": {"contents": " id=\"$1\""},
-  "command": "insert_snippet",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html meta.tag -string -punctuation.definition.tag.begin.html -meta.scope.between-tag-pair.html -source -meta.tag.template.value.twig",
-               "operator": "equal"},
-              {"key": "setting.auto_id_class",
-               "operand": true,
-               "operator": "equal"}],
-  "keys": ["#"]},
- {"args": {"contents": " class=\"$1\""},
-  "command": "insert_snippet",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html meta.tag -string -punctuation.definition.tag.begin.html -meta.scope.between-tag-pair.html -source -meta.tag.template.value.twig",
-               "operator": "equal"},
-              {"key": "setting.auto_id_class",
-               "operand": true,
-               "operator": "equal"}],
-  "keys": ["."]},
- {"args": {"contents": "id=\"$1\""},
-  "command": "insert_snippet",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html meta.tag -string -punctuation.definition.tag.begin.html -meta.scope.between-tag-pair.html -source -meta.tag.template.value.twig",
-               "operator": "equal"},
-              {"key": "preceding_text",
-               "match_all": true,
-               "operand": "\\s$",
-               "operator": "regex_contains"},
-              {"key": "setting.auto_id_class",
-               "operand": true,
-               "operator": "equal"}],
-  "keys": ["#"]},
- {"args": {"contents": "class=\"$1\""},
-  "command": "insert_snippet",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "text.html meta.tag -string -punctuation.definition.tag.begin.html -meta.scope.between-tag-pair.html -source -meta.tag.template.value.twig",
-               "operator": "equal"},
-              {"key": "preceding_text",
-               "match_all": true,
-               "operand": "\\s$",
-               "operator": "regex_contains"},
-              {"key": "setting.auto_id_class",
-               "operand": true,
-               "operator": "equal"}],
-  "keys": ["."]},
- {"__doc__": "Override for the binding in CSS/*.sublime-keymap",
-  "args": {"contents": ":"},
-  "command": "insert_snippet",
-  "context": [{"key": "setting.auto_match_enabled",
-               "operand": true,
-               "operator": "equal"},
-              {"key": "selection_empty",
-               "match_all": true,
-               "operand": true,
-               "operator": "equal"},
-              {"key": "selector",
-               "match_all": true,
-               "operand": "source.css - meta.selector.css",
-               "operator": "equal"},
-              {"key": "following_text",
-               "match_all": true,
-               "operand": "^(?:\t| |\\}|$)",
-               "operator": "regex_contains"}],
-  "keys": [":"]},
- {"command": "expand_zen_abbreviation_on_tab",
-  "context": [{"key": "selector",
-               "match_all": true,
-               "operand": "source.css - source.css.embedded, text.xml, text.html -source -meta.tag, meta.scope.between-tag-pair.html -source",
-               "operator": "equal"},
-              {"key": "selection_empty",
-               "match_all": true,
-               "operand": true,
-               "operator": "equal"},
-              {"key": "is_zen", "match_all": true}],
-  "keys": ["tab"]}]
+[{
+	"keys": ["ctrl+alt+shift+h"], "command": "set_html_syntax_and_insert_skel", "args": {"doctype": "5"}, "context":
+	[
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["ctrl+alt+enter"], "command": "zen_as_you_type", "args": {}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "source.css - source.css.embedded, text.xml, text.html -source -meta.tag, meta.scope.between-tag-pair.html -source", "match_all": true },
+		{ "key": "setting.is_widget", "operator": "equal", "operand": false },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["ctrl+alt+enter"], "command": "wrap_zen_as_you_type", "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html meta.tag - string - meta.scope.between-tag-pair.html", "match_all": true },
+		{ "key": "setting.is_widget", "operator": "equal", "operand": false },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["ctrl+alt+enter"], "command": "wrap_zen_as_you_type", "context":
+	[
+		{ "key": "selection_empty", "operator": "equal", "operand": false, "match_all": true },
+		{ "key": "num_selections", "operator": "equal", "operand": 1 },
+		{ "key": "setting.is_widget", "operator": "equal", "operand": false },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["shift+ctrl+j"], "command": "run_zen_action", "args": {"action": "split_join_tag", "profile_name": null}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, text.xml", "match_all": true },
+		{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["ctrl+alt+9"], "command": "run_zen_action", "args": {"action": "decrement_number_by_01"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "meta.property-list.css meta.property-value.css", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["ctrl+9"], "command": "run_zen_action", "args": {"action": "decrement_number_by_1"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "source.css meta.property-list.css meta.property-value.css", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["ctrl+alt+shift+9"], "command": "run_zen_action", "args": {"action": "decrement_number_by_10"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "meta.property-list.css meta.property-value.css", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Encodes/decodes image under cursor to/from base64\n\n@since: 0.65",
+	"keys": ["ctrl+shift+alt+6"], "command": "run_zen_action", "args": {"action": "encode_decode_base64"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, source.css, source.scss", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["f1"], "command": "zen_css_mnemonic", "args": {}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "source.css, source.scss", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["f1"], "command": "zen_css_mnemonic", "args": {"prop_value": true}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "meta.property-value.css", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Evaluates simple math expresison under caret\n@param editor: ZenEditor",
+	"keys": ["ctrl+alt+shift+="], "command": "run_zen_action", "args": {"action": "evaluate_math_expression"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, source.css, source.scss, text.xml", "match_all": true },
+		{ "key": "setting.alt_gr", "operator": "equal", "operand": false },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["ctrl+shift+a"], "command": "run_zen_action", "args": {"action": "match_pair_tagname"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, text.xml", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Moves caret to matching opening or closing tag",
+	"keys": ["ctrl+alt+n"], "command": "run_zen_action", "args": {"action": "go_to_matching_pair"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, text.xml", "match_all": true },
+		{ "key": "setting.alt_gr", "operator": "equal", "operand": false },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["ctrl+alt+0"], "command": "run_zen_action", "args": {"action": "increment_number_by_01"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "meta.property-list.css meta.property-value.css", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["ctrl+0"], "command": "run_zen_action", "args": {"action": "increment_number_by_1"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "meta.property-list.css meta.property-value.css", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["ctrl+alt+shift+0"], "command": "run_zen_action", "args": {"action": "increment_number_by_10"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, source.css, source.scss, text.xml", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Inserts newline character with proper indentation\n\n\n@param mode: Syntax mode (only 'html' is implemented)\n@type mode: str",
+	"keys": ["enter"], "command": "run_zen_action", "args": {"action": "insert_formatted_newline", "mode": "html"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "meta.scope.between-tag-pair.html", "match_all": true },
+		{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+		{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+		{ "key": "following_text", "operand": "^<$", "operator": "not_regex_contains", "match_all": true },
+		{ "key": "preceding_text", "operator": "regex_contains", "operand": ">$", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Find and select HTML tag pair\n\n\n@param direction: Direction of pair matching: 'in' or 'out'. \n@type direction: str ",
+	"keys": ["ctrl+shift+n"], "command": "run_zen_action", "args": {"action": "match_pair", "direction": "out", "syntax": null}, "context":
+	[
+		{ "key": "selector", "operand": "text.html, source.css, source.scss, text.xml", "operator": "equal", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["ctrl+shift+t"], "command": "run_zen_action", "args": {"action": "match_pair_inward"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, text.xml", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Merge lines spanned by user selection. If there's no selection, tries to find\nmatching tags and use them as selection",
+	"keys": ["ctrl+j"], "command": "run_zen_action", "args": {"action": "merge_lines"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, text.xml", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Move caret to next edit point",
+	"keys": ["ctrl+period"], "command": "run_zen_action", "args": {"action": "next_edit_point"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, source.css, text.xml", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Move caret to previous edit point",
+	"keys": ["ctrl+,"], "command": "run_zen_action", "args": {"action": "prev_edit_point"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, source.css, text.xml", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Reflect CSS value: takes rule's value under caret and pastes it for the same \nrules with vendor prefixes\n@param editor: ZenEditor",
+	"keys": ["ctrl+alt+shift+v"], "command": "run_zen_action", "args": {"action": "reflect_css_value"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "source.css", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Gracefully removes tag under cursor",
+	"keys": ["ctrl+shift+u"], "command": "run_zen_action", "args": {"action": "remove_tag"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, text.xml", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Splits or joins tag, e.g. transforms it into a short notation and vice versa:\n<div></div> \u2192 <div /> : join\n<div /> \u2192 <div></div> : split\n\n\n@param profile_name: Profile name\n@type profile_name: str",
+	"keys": ["ctrl+shift+j"], "command": "run_zen_action", "args": {"action": "split_join_tag", "profile_name": null}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, text.xml", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Toggle comment on current editor's selection or HTML tag/CSS rule",
+	"keys": ["ctrl+alt+/"], "command": "run_zen_action", "args": {"action": "toggle_comment"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, source.css, text.xml", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Update image size: reads image from image/CSS rule under caret\nand updates dimensions inside tag/rule",
+	"keys": ["ctrl+alt+shift+m"], "command": "run_zen_action", "args": {"action": "update_image_size"}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, source.css, source.scss", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Wraps content with abbreviation\n\n\n@param syntax: Syntax type (html, css, etc.)\n@type syntax: str\n@param profile_name: Output profile name (html, xml, xhtml)\n@type profile_name: str",
+	"keys": ["alt+shift+w"], "command": "wrap_zen_as_you_type", "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html, text.xml", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["#"], "command": "insert_snippet", "args": {"contents": " id=\"$1\""}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html meta.tag -string -punctuation.definition.tag.begin.html -meta.scope.between-tag-pair.html -source -meta.tag.template.value.twig", "match_all": true },
+		{ "key": "setting.auto_id_class", "operator": "equal", "operand": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["."], "command": "insert_snippet", "args": {"contents": " class=\"$1\""}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html meta.tag -string -punctuation.definition.tag.begin.html -meta.scope.between-tag-pair.html -source -meta.tag.template.value.twig", "match_all": true },
+		{ "key": "setting.auto_id_class", "operator": "equal", "operand": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["#"], "command": "insert_snippet", "args": {"contents": "id=\"$1\""}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html meta.tag -string -punctuation.definition.tag.begin.html -meta.scope.between-tag-pair.html -source -meta.tag.template.value.twig", "match_all": true },
+		{ "key": "preceding_text", "operator": "regex_contains", "operand": "\\s$", "match_all": true },
+		{ "key": "setting.auto_id_class", "operator": "equal", "operand": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["."], "command": "insert_snippet", "args": {"contents": "class=\"$1\""}, "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "text.html meta.tag -string -punctuation.definition.tag.begin.html -meta.scope.between-tag-pair.html -source -meta.tag.template.value.twig", "match_all": true },
+		{ "key": "preceding_text", "operator": "regex_contains", "operand": "\\s$", "match_all": true },
+		{ "key": "setting.auto_id_class", "operator": "equal", "operand": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"__doc__": "Override for the binding in CSS/*.sublime-keymap",
+	"keys": [":"], "command": "insert_snippet", "args": {"contents": ":"}, "context":
+	[
+		{ "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+		{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+		{ "key": "selector", "operator": "equal", "operand": "source.css - meta.selector.css", "match_all": true },
+		{ "key": "following_text", "operator": "regex_contains", "operand": "^(?:\t| |\\}|$)", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+},
+{
+	"keys": ["tab"], "command": "expand_zen_abbreviation_on_tab", "context":
+	[
+		{ "key": "selector", "operator": "equal", "operand": "source.css - source.css.embedded, text.xml, text.xsl, text.html -source -meta.tag, meta.scope.between-tag-pair.html -source", "match_all": true },
+		{ "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+		{ "key": "is_zen", "match_all": true },
+		{ "key": "setting.zen_keybinds", "operator": "equal", "operand": true }
+	]
+}]

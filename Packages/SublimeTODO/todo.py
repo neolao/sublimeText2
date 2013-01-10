@@ -21,7 +21,7 @@ import sublime
 import sublime_plugin
 
 
-DEBUG = False
+DEBUG = True
 
 DEFAULT_SETTINGS = {
     'result_title': 'TODO Results',
@@ -138,9 +138,11 @@ class TodoExtractor(object):
             dirpath = path.abspath(dirpath)
             for dirpath, dirnames, filenames in walk(dirpath):
                 ## remove excluded dirs
-                for dir in [dir for dir in exclude_dirs if dir in dirnames]:
-                    self.log.debug('Ignoring dir: {0}'.format(dir))
-                    dirnames.remove(dir)
+                ## TODO: These are not patterns. Consider making them glob patterns
+                for dir in exclude_dirs:
+                    if dir in dirnames:
+                        self.log.debug(u'Ignoring dir: {0}'.format(dir))
+                        dirnames.remove(dir)
 
                 for filepath in filenames:
                     pth = path.join(dirpath, filepath)
@@ -169,7 +171,7 @@ class TodoExtractor(object):
         for filepath in self.search_targets():
             try:
                 f = open(filepath)
-                self.log.debug('Scanning {0}'.format(filepath))
+                self.log.debug(u'Scanning {0}'.format(filepath))
                 for linenum, line in enumerate(f):
                     for mo in patt.finditer(line):
                         ## Remove the non-matched groups
@@ -178,10 +180,11 @@ class TodoExtractor(object):
                             yield {'filepath': filepath, 'linenum': linenum + 1, 'match': match}
             except IOError:
                 ## Probably a broken symlink
-                pass
+                f = None
             finally:
                 self.file_counter.increment()
-                f.close()
+                if f is not None:
+                    f.close()
 
 
 class TodoRenderer(object):
@@ -199,7 +202,7 @@ class TodoRenderer(object):
     def header(self):
         hr = u'+ {0} +'.format('-' * 76)
         return u'{hr}\n| TODOS @ {0:<68} |\n| {1:<76} |\n{hr}\n'.format(
-            datetime.utcnow().strftime('%A %d %B %Y %H:%M').decode("utf-8"),
+            datetime.now().strftime('%A %d %B %Y %H:%M').decode("utf-8"),
             u'{0} files scanned'.format(self.file_counter),
             hr=hr)
 
@@ -302,7 +305,7 @@ class FileScanCounter(object):
         self.log = logging.getLogger('SublimeTODO')
 
     def __call__(self, filepath):
-        self.log.debug('Scanning %s' % filepath)
+        self.log.debug(u'Scanning %s' % filepath)
         self.increment()
 
     def __str__(self):
@@ -406,7 +409,7 @@ class GotoComment(sublime_plugin.TextCommand):
         ## Convert region to key used in result_regions (this is tedious, but 
         ##    there is no other way to store regions with associated data)
         data = self.view.settings().get('result_regions')['{0},{1}'.format(selected_region.a, selected_region.b)]
-        self.log.debug('Goto comment at {filepath}:{linenum}'.format(**data))
+        self.log.debug(u'Goto comment at {filepath}:{linenum}'.format(**data))
         new_view = self.view.window().open_file(data['filepath'])
         do_when(lambda: not new_view.is_loading(), lambda: new_view.run_command("goto_line", {"line": data['linenum']}))
 
@@ -433,6 +436,6 @@ class MouseGotoComment(sublime_plugin.TextCommand):
         result = self.get_result_region(pos)
         self.highlight(result)
         data = self.view.settings().get('result_regions')['{0},{1}'.format(result.a, result.b)]
-        self.log.debug('Goto comment at {filepath}:{linenum}'.format(**data))
+        self.log.debug(u'Goto comment at {filepath}:{linenum}'.format(**data))
         new_view = self.view.window().open_file(data['filepath'])
         do_when(lambda: not new_view.is_loading(), lambda: new_view.run_command("goto_line", {"line": data['linenum']}))

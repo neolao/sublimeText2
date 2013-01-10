@@ -22,19 +22,36 @@ All commands available for files and folders(when applicable) .
 
 # F12 key
 
-
 F12 key allows you to open the current file in browser.
 If you want to add a url to that feature:
-Right click the sidebar -> project -> edit project
-There add the new preferences:
+
+ * Right click any file on sidebar and select: "Project -> Edit Projects Preview URLs"
+ * Edit this file, and add your paths and URLs with the following structure:
 
 ```
-, "url":"http://localhost/"
-, "url_production":"http://domain.test/"
+{
+	"S:/www/domain.tld":{
+		"url_testing":"http://testing",
+		"url_production":"http://domain.tld"
+	},
+	"C:/Users/luna/some/domain2.tld":{
+		"url_testing":"http://testing1",
+		"url_production":"http://productiontld2"
+	}
+}
 ```
 
-```url``` allows you to set the url of your local server, opened via F12
+```url_testing``` allows you to set the url of your local server, opened via F12
+
 ```url_production``` allows you to set the url of your production server, opened via ALT+F12
+
+# Notes on configuring the `Open With` menu:
+
+Definitions file:  `User/SidebarEnhancements/Open With/Side Bar.sublime-menu` (note the extra subfolder levels).
+To open it, right-click on any file in an open project and select `Open With > Edit Applications...`
+
+- On OSX, the 'application' property simply takes the *name* of an application, to which the file at hand's full path will be passed as if with `open ...`, e.g.: "application": "Google Chrome"
+- On OSX, invoking *shell* commands is NOT supported.
 
 # Todo
 
@@ -46,11 +63,13 @@ Install this repository via "Package Control" http://wbond.net/sublime_packages/
 
 # FAQ
 
+Q: Uninstall?
 
-Uninstall
+ * Follow the instructions here: https://github.com/titoBouzout/SideBarEnhancements/issues/18
 
-Follow the instructions here: https://github.com/titoBouzout/SideBarEnhancements/issues/18
+Q: Why the menu is not shown on `Open Files`?
 
+- It should be mentioned that the package's context menu is only available for files and folders **in a project (section `Folders` in the side bar)**, and _not_ on the open files listed at the top of the side bar, due to a limitation of ST2.
 
 # Using the External Libraries
 
@@ -69,6 +88,13 @@ https://github.com/titoBouzout/SideBarEnhancements
 
 
 http://www.sublimetext.com/forum/viewtopic.php?f=5&t=3331
+
+# Contributors:
+
+	- Leif Ringstad
+	- Sven Axelsson
+	- Dalibor Simacek
+	- Stephen Horne
 
 # Update v1.2:
 
