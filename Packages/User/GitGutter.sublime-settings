@@ -1,0 +1,4 @@
+{
+  // Custom path to git binary when not in PATH
+  "git_binary": "/usr/local/git/bin/git"
+}
